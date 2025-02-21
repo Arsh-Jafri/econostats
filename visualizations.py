@@ -10,30 +10,52 @@ def create_time_series_plot(df, title, y_label):
     # Get the column name from the dataframe
     value_col = df.columns[0]
     
-    fig = px.line(df, 
-                  x=df.index,
-                  y=value_col,
-                  title=title,
-                  labels={value_col: y_label},
-                  template='plotly_white')
+    # Convert dates to strings for JSON serialization
+    x_data = df.index.strftime('%Y-%m-%d').tolist()
+    y_data = df[value_col].tolist()
+    
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=x_data,
+            y=y_data,
+            name=y_label,
+            line=dict(color='blue')
+        )
+    )
     
     # Customize the layout
     fig.update_layout(
-        hovermode='x unified',
-        title={
-            'y':0.95,
-            'x':0.5,
-            'xanchor': 'center',
-            'yanchor': 'top'
-        },
+        title=title,
+        title_x=0.5,
         title_font_size=20,
+        template='plotly_white',
+        hovermode='x unified',
+        height=400,
+        margin=dict(l=40, r=20, t=60, b=80),  # Adjusted margins
         showlegend=True,
-        legend_title_text='Indicators',
-        height=400,  # Set a fixed height
-        margin=dict(l=50, r=50, t=80, b=50)  # Add margins
+        legend=dict(
+            orientation="h",  # Horizontal legend
+            yanchor="bottom",
+            y=-0.3,  # Position below the plot
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            title="Date",
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='rgba(211,211,211,0.5)'
+        ),
+        yaxis=dict(
+            title=y_label,
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='rgba(211,211,211,0.5)'
+        )
     )
     
-    # Enhance the hover information using correct Plotly syntax
+    # Enhance the hover information
     fig.update_traces(
         hovertemplate=f"Date: %{{x}}<br>{y_label}: %{{y:.2f}}<extra></extra>"
     )
@@ -77,50 +99,43 @@ def create_dashboard_components(cpi_df, savings_df, consumption_df):
     """
     Create all visualization components for the dashboard
     """
-    # Create the plots
-    cpi_plot = create_time_series_plot(
-        cpi_df, 
-        'Consumer Price Index (CPI)', 
-        'CPI'
-    )
+    plots_data = {}
+    tables_html = {}
     
-    savings_plot = create_time_series_plot(
-        savings_df, 
-        'Personal Savings Rate', 
-        'Savings Rate (%)'
-    )
+    # Create the plots and tables only for available data
+    if cpi_df is not None:
+        cpi_plot = create_time_series_plot(
+            cpi_df, 
+            'Consumer Price Index (CPI)', 
+            'CPI'
+        )
+        plots_data['cpi'] = cpi_plot.to_dict()  # Convert to dict instead of HTML
+        tables_html['cpi'] = create_summary_table(cpi_df)
     
-    consumption_plot = create_time_series_plot(
-        consumption_df, 
-        'Personal Consumption Expenditures', 
-        'Expenditures (Billions $)'
-    )
+    if savings_df is not None:
+        savings_plot = create_time_series_plot(
+            savings_df, 
+            'Personal Savings Rate', 
+            'Savings Rate (%)'
+        )
+        plots_data['savings'] = savings_plot.to_dict()  # Convert to dict instead of HTML
+        tables_html['savings'] = create_summary_table(savings_df)
     
-    # Create summary tables
-    cpi_table = create_summary_table(cpi_df)
-    savings_table = create_summary_table(savings_df)
-    consumption_table = create_summary_table(consumption_df)
+    if consumption_df is not None:
+        consumption_plot = create_time_series_plot(
+            consumption_df, 
+            'Personal Consumption Expenditures', 
+            'Expenditures (Billions $)'
+        )
+        plots_data['consumption'] = consumption_plot.to_dict()  # Convert to dict instead of HTML
+        tables_html['consumption'] = create_summary_table(consumption_df)
     
-    # Convert plots to HTML
-    plots_html = {
-        'cpi': cpi_plot.to_html(full_html=False, include_plotlyjs=False),
-        'savings': savings_plot.to_html(full_html=False, include_plotlyjs=False),
-        'consumption': consumption_plot.to_html(full_html=False, include_plotlyjs=False)
-    }
-    
-    tables_html = {
-        'cpi': cpi_table,
-        'savings': savings_table,
-        'consumption': consumption_table
-    }
-    
-    return plots_html, tables_html
+    return plots_data, tables_html
 
 def create_combined_plot(cpi_df, savings_df, consumption_df):
     """
     Create a combined plot with all indicators (normalized)
     """
-    # Create figure with secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
     # Normalize each series (0-100 scale)
@@ -128,26 +143,41 @@ def create_combined_plot(cpi_df, savings_df, consumption_df):
         series = series.dropna()
         if len(series) == 0 or series.max() == series.min():
             return series
-        return 100 * (series - series.min()) / (series.max() - series.min())
+        return (100 * (series - series.min()) / (series.max() - series.min())).tolist()
     
-    # Add traces
-    fig.add_trace(
-        go.Scatter(x=cpi_df.index, y=normalize_series(cpi_df['CPIAUCSL']),
-                  name="CPI", line=dict(color='blue')),
-        secondary_y=False
-    )
+    # Add traces only for available data
+    if cpi_df is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=cpi_df.index.strftime('%Y-%m-%d').tolist(),
+                y=normalize_series(cpi_df['CPIAUCSL']),
+                name="CPI",
+                line=dict(color='blue')
+            ),
+            secondary_y=False
+        )
     
-    fig.add_trace(
-        go.Scatter(x=savings_df.index, y=normalize_series(savings_df['PSAVERT']),
-                  name="Savings Rate", line=dict(color='green')),
-        secondary_y=False
-    )
+    if savings_df is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=savings_df.index.strftime('%Y-%m-%d').tolist(),
+                y=normalize_series(savings_df['PSAVERT']),
+                name="Savings Rate",
+                line=dict(color='green')
+            ),
+            secondary_y=False
+        )
     
-    fig.add_trace(
-        go.Scatter(x=consumption_df.index, y=normalize_series(consumption_df['PCEC']),
-                  name="Consumption", line=dict(color='red')),
-        secondary_y=False
-    )
+    if consumption_df is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=consumption_df.index.strftime('%Y-%m-%d').tolist(),
+                y=normalize_series(consumption_df['PCEC']),
+                name="Consumption",
+                line=dict(color='red')
+            ),
+            secondary_y=False
+        )
     
     # Update layout
     fig.update_layout(
@@ -155,14 +185,34 @@ def create_combined_plot(cpi_df, savings_df, consumption_df):
         title_x=0.5,
         template='plotly_white',
         hovermode='x unified',
-        height=500,  # Taller plot for the combined view
-        margin=dict(l=50, r=50, t=80, b=50)
+        height=500,
+        margin=dict(l=40, r=20, t=60, b=80),  # Adjusted margins
+        showlegend=True,
+        legend=dict(
+            orientation="h",  # Horizontal legend
+            yanchor="bottom",
+            y=-0.2,  # Position below the plot
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            title="Date",
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='rgba(211,211,211,0.5)'
+        )
     )
     
     # Update axes labels
-    fig.update_yaxes(title_text="Normalized Scale (0-100)", secondary_y=False)
+    fig.update_yaxes(
+        title_text="Normalized Scale (0-100)",
+        showgrid=True,
+        gridwidth=1,
+        gridcolor='rgba(211,211,211,0.5)',
+        secondary_y=False
+    )
     
-    return fig 
+    return fig
 
 def filter_dataframe(df, start_date, end_date):
     """

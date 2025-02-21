@@ -87,6 +87,31 @@
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
                 </div>
             </form>
+            <h5 class="mb-3">Upload Custom Data</h5>
+            <form id="upload-form" class="mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="data-type" class="col-form-label">Data Type:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="data-type" required>
+                            <option value="">Choose...</option>
+                            <option value="cpi">CPI</option>
+                            <option value="savings">Savings Rate</option>
+                            <option value="consumption">Consumption</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <input type="file" class="form-control" id="csv-file" accept=".csv" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-secondary">Upload</button>
+                    </div>
+                </div>
+                <small class="form-text text-muted">
+                    CSV file should have a date column and a value column. Dates should be in YYYY-MM-DD format.
+                </small>
+            </form>
         </div>
 
         <!-- Combined Plot -->
@@ -94,7 +119,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        {{ combined_plot | safe }}
+                        <div id="combined-plot"></div>
                     </div>
                 </div>
             </div>
@@ -103,11 +128,11 @@
         <!-- Individual Indicators -->
         <div class="row">
             <!-- CPI Section -->
-            <div class="col-md-4">
+            <div class="col-md-4" id="cpi-section">
                 <div class="card">
                     <div class="card-body">
-                        {{ plots.cpi | safe }}
-                        <div class="mt-3">
+                        <div id="cpi-plot"></div>
+                        <div class="mt-3" id="cpi-table">
                             {{ tables.cpi | safe }}
                         </div>
                     </div>
@@ -115,11 +140,11 @@
             </div>
             
             <!-- Savings Rate Section -->
-            <div class="col-md-4">
+            <div class="col-md-4" id="savings-section">
                 <div class="card">
                     <div class="card-body">
-                        {{ plots.savings | safe }}
-                        <div class="mt-3">
+                        <div id="savings-plot"></div>
+                        <div class="mt-3" id="savings-table">
                             {{ tables.savings | safe }}
                         </div>
                     </div>
@@ -127,11 +152,11 @@
             </div>
             
             <!-- Consumption Section -->
-            <div class="col-md-4">
+            <div class="col-md-4" id="consumption-section">
                 <div class="card">
                     <div class="card-body">
-                        {{ plots.consumption | safe }}
-                        <div class="mt-3">
+                        <div id="consumption-plot"></div>
+                        <div class="mt-3" id="consumption-table">
                             {{ tables.consumption | safe }}
                         </div>
                     </div>
@@ -142,14 +167,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize date inputs with the data range
         document.addEventListener('DOMContentLoaded', function() {
-            // Set initial date range (you'll need to pass these from Flask)
+            // Set initial date range
             const startDate = "1947-01-01";
             const endDate = "2024-12-01";
             
             document.getElementById('start-date').value = startDate;
             document.getElementById('end-date').value = endDate;
+
+            // Show/hide sections based on checkboxes
+            function updateSectionVisibility() {
+                document.getElementById('cpi-section').style.display = 
+                    document.getElementById('cpi-check').checked ? 'block' : 'none';
+                document.getElementById('savings-section').style.display = 
+                    document.getElementById('savings-check').checked ? 'block' : 'none';
+                document.getElementById('consumption-section').style.display = 
+                    document.getElementById('consumption-check').checked ? 'block' : 'none';
+            }
+
+            // Add visibility toggle to checkboxes
+            document.getElementById('cpi-check').addEventListener('change', updateSectionVisibility);
+            document.getElementById('savings-check').addEventListener('change', updateSectionVisibility);
+            document.getElementById('consumption-check').addEventListener('change', updateSectionVisibility);
             
             // Handle form submission
             document.getElementById('filter-form').addEventListener('submit', async function(e) {
@@ -176,27 +215,101 @@
                         body: JSON.stringify(filters)
                     });
                     
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
                     const data = await response.json();
                     
-                    // Update the plots
+                    // Update the combined plot
                     Plotly.newPlot('combined-plot', data.combined_plot.data, data.combined_plot.layout);
                     
-                    // Update individual plots if they're selected
-                    if (filters.indicators.cpi) {
-                        Plotly.newPlot('cpi-plot', data.plots.cpi.data, data.plots.cpi.layout);
-                        document.getElementById('cpi-table').innerHTML = data.tables.cpi;
-                    }
-                    if (filters.indicators.savings) {
-                        Plotly.newPlot('savings-plot', data.plots.savings.data, data.plots.savings.layout);
-                        document.getElementById('savings-table').innerHTML = data.tables.savings;
-                    }
-                    if (filters.indicators.consumption) {
-                        Plotly.newPlot('consumption-plot', data.plots.consumption.data, data.plots.consumption.layout);
-                        document.getElementById('consumption-table').innerHTML = data.tables.consumption;
-                    }
+                    // Update individual plots
+                    const sections = ['cpi', 'savings', 'consumption'];
+                    sections.forEach(section => {
+                        if (filters.indicators[section] && data.plots[section]) {
+                            Plotly.newPlot(
+                                `${section}-plot`,
+                                data.plots[section].data,
+                                data.plots[section].layout
+                            );
+                            
+                            // Update the table
+                            if (data.tables[section]) {
+                                document.getElementById(`${section}-table`).innerHTML = data.tables[section];
+                            }
+                        }
+                    });
+                    
+                    // Update visibility
+                    updateSectionVisibility();
                     
                 } catch (error) {
                     console.error('Error updating dashboard:', error);
+                    alert('Error updating dashboard. Check console for details.');
+                }
+            });
+
+            // Initial visibility update
+            updateSectionVisibility();
+
+            // Initialize all plots when the page loads
+            // Initialize combined plot
+            Plotly.newPlot('combined-plot', 
+                {{ combined_plot.data | tojson }}, 
+                {{ combined_plot.layout | tojson }}
+            );
+            
+            // Initialize individual plots
+            {% if plots.cpi %}
+                Plotly.newPlot('cpi-plot', 
+                    {{ plots.cpi.data | tojson }}, 
+                    {{ plots.cpi.layout | tojson }}
+                );
+            {% endif %}
+            
+            {% if plots.savings %}
+                Plotly.newPlot('savings-plot', 
+                    {{ plots.savings.data | tojson }}, 
+                    {{ plots.savings.layout | tojson }}
+                );
+            {% endif %}
+            
+            {% if plots.consumption %}
+                Plotly.newPlot('consumption-plot', 
+                    {{ plots.consumption.data | tojson }}, 
+                    {{ plots.consumption.layout | tojson }}
+                );
+            {% endif %}
+
+            // Add this to your existing JavaScript
+            document.getElementById('upload-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('file', document.getElementById('csv-file').files[0]);
+                formData.append('type', document.getElementById('data-type').value);
+                
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Upload failed');
+                    }
+                    
+                    const result = await response.json();
+                    alert('Data uploaded successfully!');
+                    
+                    // Refresh the dashboard
+                    window.location.reload();
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert(`Upload failed: ${error.message}`);
                 }
             });
         });
