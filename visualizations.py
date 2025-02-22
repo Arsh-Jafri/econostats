@@ -95,89 +95,41 @@ def create_summary_table(df):
     
     return table_html
 
-def create_dashboard_components(cpi_df, savings_df, consumption_df):
+def create_dashboard_components(datasets):
     """
     Create all visualization components for the dashboard
     """
     plots_data = {}
     tables_html = {}
     
-    # Create the plots and tables only for available data
-    if cpi_df is not None:
-        cpi_plot = create_time_series_plot(
-            cpi_df, 
-            'Consumer Price Index (CPI)', 
-            'CPI'
-        )
-        plots_data['cpi'] = cpi_plot.to_dict()  # Convert to dict instead of HTML
-        tables_html['cpi'] = create_summary_table(cpi_df)
-    
-    if savings_df is not None:
-        savings_plot = create_time_series_plot(
-            savings_df, 
-            'Personal Savings Rate', 
-            'Savings Rate (%)'
-        )
-        plots_data['savings'] = savings_plot.to_dict()  # Convert to dict instead of HTML
-        tables_html['savings'] = create_summary_table(savings_df)
-    
-    if consumption_df is not None:
-        consumption_plot = create_time_series_plot(
-            consumption_df, 
-            'Personal Consumption Expenditures', 
-            'Expenditures (Billions $)'
-        )
-        plots_data['consumption'] = consumption_plot.to_dict()  # Convert to dict instead of HTML
-        tables_html['consumption'] = create_summary_table(consumption_df)
+    # Create plots and tables for each dataset
+    for name, df in datasets.items():
+        if df is not None:
+            plot = create_time_series_plot(df, name, name)
+            plots_data[name] = plot.to_dict()
+            tables_html[name] = create_summary_table(df)
     
     return plots_data, tables_html
 
-def create_combined_plot(cpi_df, savings_df, consumption_df):
+def create_combined_plot(datasets):
     """
     Create a combined plot with all indicators (normalized)
     """
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Normalize each series (0-100 scale)
-    def normalize_series(series):
-        series = series.dropna()
-        if len(series) == 0 or series.max() == series.min():
-            return series
-        return (100 * (series - series.min()) / (series.max() - series.min())).tolist()
+    colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink']
     
-    # Add traces only for available data
-    if cpi_df is not None:
-        fig.add_trace(
-            go.Scatter(
-                x=cpi_df.index.strftime('%Y-%m-%d').tolist(),
-                y=normalize_series(cpi_df['CPIAUCSL']),
-                name="CPI",
-                line=dict(color='blue')
-            ),
-            secondary_y=False
-        )
-    
-    if savings_df is not None:
-        fig.add_trace(
-            go.Scatter(
-                x=savings_df.index.strftime('%Y-%m-%d').tolist(),
-                y=normalize_series(savings_df['PSAVERT']),
-                name="Savings Rate",
-                line=dict(color='green')
-            ),
-            secondary_y=False
-        )
-    
-    if consumption_df is not None:
-        fig.add_trace(
-            go.Scatter(
-                x=consumption_df.index.strftime('%Y-%m-%d').tolist(),
-                y=normalize_series(consumption_df['PCEC']),
-                name="Consumption",
-                line=dict(color='red')
-            ),
-            secondary_y=False
-        )
+    for (name, df), color in zip(datasets.items(), colors):
+        if df is not None:
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index.strftime('%Y-%m-%d').tolist(),
+                    y=normalize_series(df.iloc[:, 0]),
+                    name=name,
+                    line=dict(color=color)
+                ),
+                secondary_y=False
+            )
     
     # Update layout
     fig.update_layout(
@@ -222,4 +174,10 @@ def filter_dataframe(df, start_date, end_date):
         return None
     
     mask = (df.index >= start_date) & (df.index <= end_date)
-    return df.loc[mask] 
+    return df.loc[mask]
+
+def normalize_series(series):
+    series = series.dropna()
+    if len(series) == 0 or series.max() == series.min():
+        return series
+    return (100 * (series - series.min()) / (series.max() - series.min())).tolist() 

@@ -91,15 +91,11 @@
             <form id="upload-form" class="mb-4">
                 <div class="row g-3 align-items-center">
                     <div class="col-auto">
-                        <label for="data-type" class="col-form-label">Data Type:</label>
+                        <label for="dataset-name" class="col-form-label">Dataset Name:</label>
                     </div>
                     <div class="col-auto">
-                        <select class="form-select" id="data-type" required>
-                            <option value="">Choose...</option>
-                            <option value="cpi">CPI</option>
-                            <option value="savings">Savings Rate</option>
-                            <option value="consumption">Consumption</option>
-                        </select>
+                        <input type="text" class="form-control" id="dataset-name" required 
+                               placeholder="Enter a name for your dataset">
                     </div>
                     <div class="col-auto">
                         <input type="file" class="form-control" id="csv-file" accept=".csv" required>
@@ -288,7 +284,7 @@
                 
                 const formData = new FormData();
                 formData.append('file', document.getElementById('csv-file').files[0]);
-                formData.append('type', document.getElementById('data-type').value);
+                formData.append('name', document.getElementById('dataset-name').value);
                 
                 try {
                     const response = await fetch('/upload', {
@@ -304,6 +300,9 @@
                     const result = await response.json();
                     alert('Data uploaded successfully!');
                     
+                    // Add new indicator checkbox
+                    addIndicatorCheckbox(result.name);
+                    
                     // Refresh the dashboard
                     window.location.reload();
                     
@@ -312,6 +311,20 @@
                     alert(`Upload failed: ${error.message}`);
                 }
             });
+
+            // Add this after page load
+            function addIndicatorCheckbox(name) {
+                const checkbox = document.createElement('div');
+                checkbox.className = 'form-check form-check-inline';
+                checkbox.innerHTML = `
+                    <input class="form-check-input" type="checkbox" id="${name}-check" value="${name}" checked>
+                    <label class="form-check-label" for="${name}-check">${name}</label>
+                `;
+                document.querySelector('.indicator-controls').appendChild(checkbox);
+                
+                // Add event listener
+                document.getElementById(`${name}-check`).addEventListener('change', updateSectionVisibility);
+            }
         });
     </script>
 </body>
