@@ -25,39 +25,51 @@ def create_time_series_plot(df, title, y_label):
             x=x_data,
             y=y_data,
             name=y_label,
-            line=dict(color='blue')
+            line=dict(color='#2c3e50', width=2)
         )
     )
     
-    # Customize the layout
+    # Customize the layout with DM Sans
     fig.update_layout(
-        title=title,
-        title_x=0.5,
-        title_font_size=20,
+        title=dict(
+            text=title,
+            x=0.5,
+            font=dict(
+                family='DM Sans',
+                size=20,
+                color='#2c3e50'
+            )
+        ),
         template='plotly_white',
         hovermode='x unified',
         height=400,
-        margin=dict(l=40, r=20, t=60, b=80),  # Adjusted margins
+        margin=dict(l=40, r=20, t=60, b=80),
         showlegend=True,
         legend=dict(
-            orientation="h",  # Horizontal legend
+            orientation="h",
             yanchor="bottom",
-            y=-0.3,  # Position below the plot
+            y=-0.3,
             xanchor="center",
-            x=0.5
+            x=0.5,
+            font=dict(family='DM Sans')
         ),
         xaxis=dict(
             title="Date",
             showgrid=True,
             gridwidth=1,
-            gridcolor='rgba(211,211,211,0.5)'
+            gridcolor='rgba(211,211,211,0.5)',
+            tickfont=dict(family='DM Sans'),
+            title_font=dict(family='DM Sans', color='#2c3e50')
         ),
         yaxis=dict(
             title=y_label,
             showgrid=True,
             gridwidth=1,
-            gridcolor='rgba(211,211,211,0.5)'
-        )
+            gridcolor='rgba(211,211,211,0.5)',
+            tickfont=dict(family='DM Sans'),
+            title_font=dict(family='DM Sans', color='#2c3e50')
+        ),
+        font=dict(family='DM Sans')  # Set default font for all text
     )
     
     # Enhance the hover information
@@ -139,21 +151,21 @@ def create_combined_plot(data_dict):
     """
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Color map for different indicators
+    # Modern color palette
     colors = {
-        'CPIAUCSL': 'blue',
-        'PSAVERT': 'green',
-        'PCEC': 'red',
-        'GDPC1': 'purple',
-        'UNRATE': 'orange',
-        'FEDFUNDS': 'brown',
-        'M2SL': 'pink',
-        'GS10': 'gray',
-        'INDPRO': 'cyan',
-        'CSUSHPINSA': 'magenta',
-        'RRSFS': 'olive',
-        'UMCSENT': 'teal',
-        'CPILFESL': 'navy'
+        'CPIAUCSL': '#2c3e50',  # Dark blue
+        'PSAVERT': '#27ae60',   # Green
+        'PCEC': '#c0392b',      # Red
+        'GDPC1': '#8e44ad',     # Purple
+        'UNRATE': '#d35400',    # Orange
+        'FEDFUNDS': '#795548',  # Brown
+        'M2SL': '#e91e63',      # Pink
+        'GS10': '#607d8b',      # Gray
+        'INDPRO': '#00bcd4',    # Cyan
+        'CSUSHPINSA': '#9c27b0', # Magenta
+        'RRSFS': '#827717',     # Olive
+        'UMCSENT': '#009688',   # Teal
+        'CPILFESL': '#1a237e'   # Navy
     }
     
     # Normalize each series (0-100 scale)
@@ -180,10 +192,17 @@ def create_combined_plot(data_dict):
                 secondary_y=False
             )
     
-    # Update layout
+    # Update layout with DM Sans
     fig.update_layout(
-        title="Combined Economic Indicators (Normalized)",
-        title_x=0.5,
+        title=dict(
+            text="Combined Economic Indicators (Normalized)",
+            x=0.5,
+            font=dict(
+                family='DM Sans',
+                size=24,
+                color='#2c3e50'
+            )
+        ),
         template='plotly_white',
         hovermode='x unified',
         height=500,
@@ -194,23 +213,29 @@ def create_combined_plot(data_dict):
             yanchor="bottom",
             y=-0.2,
             xanchor="center",
-            x=0.5
+            x=0.5,
+            font=dict(family='DM Sans')
         ),
         xaxis=dict(
             title="Date",
             showgrid=True,
             gridwidth=1,
-            gridcolor='rgba(211,211,211,0.5)'
-        )
+            gridcolor='rgba(211,211,211,0.5)',
+            tickfont=dict(family='DM Sans'),
+            title_font=dict(family='DM Sans', color='#2c3e50')
+        ),
+        font=dict(family='DM Sans')  # Set default font for all text
     )
     
-    # Update axes labels
+    # Update axes labels with DM Sans
     fig.update_yaxes(
         title_text="Normalized Scale (0-100)",
         showgrid=True,
         gridwidth=1,
         gridcolor='rgba(211,211,211,0.5)',
-        secondary_y=False
+        secondary_y=False,
+        tickfont=dict(family='DM Sans'),
+        title_font=dict(family='DM Sans', color='#2c3e50')
     )
     
     return fig

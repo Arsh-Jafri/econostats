@@ -6,7 +6,7 @@ import os
 from werkzeug.utils import secure_filename
 from fred_api import FredData
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
