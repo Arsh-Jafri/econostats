@@ -50,6 +50,23 @@
             background-color: #2c3e50;
             border-color: #2c3e50;
         }
+        .indicator-search {
+            margin-bottom: 15px;
+        }
+        
+        .form-check {
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .form-check:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .search-highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
@@ -60,18 +77,72 @@
         <div class="controls-panel">
             <form id="filter-form" class="mb-4">
                 <div class="indicator-controls">
+                    <div class="mb-3">
+                        <strong>Search Indicators:</strong>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="indicator-search" placeholder="Search indicators...">
+                        </div>
+                    </div>
                     <strong>Select Indicators:</strong>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="cpi-check" value="cpi" checked>
-                        <label class="form-check-label" for="cpi-check">CPI</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="savings-check" value="savings" checked>
-                        <label class="form-check-label" for="savings-check">Savings Rate</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="consumption-check" value="consumption" checked>
-                        <label class="form-check-label" for="consumption-check">Consumption</label>
+                    <div class="row mt-2" id="indicator-checkboxes">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="CPIAUCSL-check" value="CPIAUCSL">
+                                <label class="form-check-label" for="CPIAUCSL-check">Consumer Price Index (CPIAUCSL)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="PSAVERT-check" value="PSAVERT">
+                                <label class="form-check-label" for="PSAVERT-check">Personal Savings Rate (PSAVERT)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="PCEC-check" value="PCEC">
+                                <label class="form-check-label" for="PCEC-check">Personal Consumption (PCEC)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="GDPC1-check" value="GDPC1">
+                                <label class="form-check-label" for="GDPC1-check">Real GDP (GDPC1)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="UNRATE-check" value="UNRATE">
+                                <label class="form-check-label" for="UNRATE-check">Unemployment Rate (UNRATE)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="FEDFUNDS-check" value="FEDFUNDS">
+                                <label class="form-check-label" for="FEDFUNDS-check">Federal Funds Rate (FEDFUNDS)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="M2SL-check" value="M2SL">
+                                <label class="form-check-label" for="M2SL-check">M2 Money Stock (M2SL)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="GS10-check" value="GS10">
+                                <label class="form-check-label" for="GS10-check">10-Year Treasury Rate (GS10)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="INDPRO-check" value="INDPRO">
+                                <label class="form-check-label" for="INDPRO-check">Industrial Production (INDPRO)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="CSUSHPINSA-check" value="CSUSHPINSA">
+                                <label class="form-check-label" for="CSUSHPINSA-check">Home Price Index (CSUSHPINSA)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="RRSFS-check" value="RRSFS">
+                                <label class="form-check-label" for="RRSFS-check">Retail Sales (RRSFS)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="UMCSENT-check" value="UMCSENT">
+                                <label class="form-check-label" for="UMCSENT-check">Consumer Sentiment (UMCSENT)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="CPILFESL-check" value="CPILFESL">
+                                <label class="form-check-label" for="CPILFESL-check">Core CPI (CPILFESL)</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="date-controls">
@@ -91,11 +162,15 @@
             <form id="upload-form" class="mb-4">
                 <div class="row g-3 align-items-center">
                     <div class="col-auto">
-                        <label for="dataset-name" class="col-form-label">Dataset Name:</label>
+                        <label for="data-type" class="col-form-label">Data Type:</label>
                     </div>
                     <div class="col-auto">
-                        <input type="text" class="form-control" id="dataset-name" required 
-                               placeholder="Enter a name for your dataset">
+                        <select class="form-select" id="data-type" required>
+                            <option value="">Choose...</option>
+                            <option value="cpi">CPI</option>
+                            <option value="savings">Savings Rate</option>
+                            <option value="consumption">Consumption</option>
+                        </select>
                     </div>
                     <div class="col-auto">
                         <input type="file" class="form-control" id="csv-file" accept=".csv" required>
@@ -122,42 +197,19 @@
         </div>
 
         <!-- Individual Indicators -->
-        <div class="row">
-            <!-- CPI Section -->
-            <div class="col-md-4" id="cpi-section">
+        <div class="row" id="indicators-container">
+            {% for indicator_id, description in indicators.items() %}
+            <div class="col-md-4" id="{{ indicator_id }}-section">
                 <div class="card">
                     <div class="card-body">
-                        <div id="cpi-plot"></div>
-                        <div class="mt-3" id="cpi-table">
-                            {{ tables.cpi | safe }}
+                        <div id="{{ indicator_id }}-plot"></div>
+                        <div class="mt-3" id="{{ indicator_id }}-table">
+                            {{ tables[indicator_id] | safe if tables[indicator_id] }}
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Savings Rate Section -->
-            <div class="col-md-4" id="savings-section">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="savings-plot"></div>
-                        <div class="mt-3" id="savings-table">
-                            {{ tables.savings | safe }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Consumption Section -->
-            <div class="col-md-4" id="consumption-section">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="consumption-plot"></div>
-                        <div class="mt-3" id="consumption-table">
-                            {{ tables.consumption | safe }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -173,29 +225,24 @@
 
             // Show/hide sections based on checkboxes
             function updateSectionVisibility() {
-                document.getElementById('cpi-section').style.display = 
-                    document.getElementById('cpi-check').checked ? 'block' : 'none';
-                document.getElementById('savings-section').style.display = 
-                    document.getElementById('savings-check').checked ? 'block' : 'none';
-                document.getElementById('consumption-section').style.display = 
-                    document.getElementById('consumption-check').checked ? 'block' : 'none';
+                document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                    const section = document.getElementById(`${checkbox.value}-section`);
+                    if (section) {
+                        section.style.display = checkbox.checked ? 'block' : 'none';
+                    }
+                });
             }
 
-            // Add visibility toggle to checkboxes
-            document.getElementById('cpi-check').addEventListener('change', updateSectionVisibility);
-            document.getElementById('savings-check').addEventListener('change', updateSectionVisibility);
-            document.getElementById('consumption-check').addEventListener('change', updateSectionVisibility);
-            
-            // Handle form submission
-            document.getElementById('filter-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
+            // Function to update dashboard
+            async function updateDashboard() {
+                // Get all indicators from checkboxes
+                const indicators = {};
+                document.querySelectorAll('.form-check-input').forEach(cb => {
+                    indicators[cb.value] = cb.checked;
+                });
                 
                 const filters = {
-                    indicators: {
-                        cpi: document.getElementById('cpi-check').checked,
-                        savings: document.getElementById('savings-check').checked,
-                        consumption: document.getElementById('consumption-check').checked
-                    },
+                    indicators: indicators,
                     dateRange: {
                         start: document.getElementById('start-date').value,
                         end: document.getElementById('end-date').value
@@ -221,18 +268,21 @@
                     Plotly.newPlot('combined-plot', data.combined_plot.data, data.combined_plot.layout);
                     
                     // Update individual plots
-                    const sections = ['cpi', 'savings', 'consumption'];
-                    sections.forEach(section => {
-                        if (filters.indicators[section] && data.plots[section]) {
-                            Plotly.newPlot(
-                                `${section}-plot`,
-                                data.plots[section].data,
-                                data.plots[section].layout
-                            );
+                    Object.keys(indicators).forEach(indicator => {
+                        if (indicators[indicator] && data.plots[indicator]) {
+                            const plotDiv = document.getElementById(`${indicator}-plot`);
+                            if (plotDiv) {
+                                Plotly.newPlot(
+                                    `${indicator}-plot`,
+                                    data.plots[indicator].data,
+                                    data.plots[indicator].layout
+                                );
+                            }
                             
-                            // Update the table
-                            if (data.tables[section]) {
-                                document.getElementById(`${section}-table`).innerHTML = data.tables[section];
+                            // Update table if it exists
+                            const tableDiv = document.getElementById(`${indicator}-table`);
+                            if (tableDiv && data.tables[indicator]) {
+                                tableDiv.innerHTML = data.tables[indicator];
                             }
                         }
                     });
@@ -244,39 +294,38 @@
                     console.error('Error updating dashboard:', error);
                     alert('Error updating dashboard. Check console for details.');
                 }
+            }
+
+            // Add event listeners to checkboxes
+            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    updateSectionVisibility();
+                    updateDashboard();
+                });
             });
 
-            // Initial visibility update
-            updateSectionVisibility();
+            // Add event listener to form
+            document.getElementById('filter-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await updateDashboard();
+            });
 
-            // Initialize all plots when the page loads
-            // Initialize combined plot
+            // Initialize plots
             Plotly.newPlot('combined-plot', 
                 {{ combined_plot.data | tojson }}, 
                 {{ combined_plot.layout | tojson }}
             );
             
             // Initialize individual plots
-            {% if plots.cpi %}
-                Plotly.newPlot('cpi-plot', 
-                    {{ plots.cpi.data | tojson }}, 
-                    {{ plots.cpi.layout | tojson }}
+            {% for indicator_id in plots %}
+                Plotly.newPlot('{{ indicator_id }}-plot', 
+                    {{ plots[indicator_id].data | tojson }}, 
+                    {{ plots[indicator_id].layout | tojson }}
                 );
-            {% endif %}
-            
-            {% if plots.savings %}
-                Plotly.newPlot('savings-plot', 
-                    {{ plots.savings.data | tojson }}, 
-                    {{ plots.savings.layout | tojson }}
-                );
-            {% endif %}
-            
-            {% if plots.consumption %}
-                Plotly.newPlot('consumption-plot', 
-                    {{ plots.consumption.data | tojson }}, 
-                    {{ plots.consumption.layout | tojson }}
-                );
-            {% endif %}
+            {% endfor %}
+
+            // Initial visibility update
+            updateSectionVisibility();
 
             // Add this to your existing JavaScript
             document.getElementById('upload-form').addEventListener('submit', async function(e) {
@@ -284,7 +333,7 @@
                 
                 const formData = new FormData();
                 formData.append('file', document.getElementById('csv-file').files[0]);
-                formData.append('name', document.getElementById('dataset-name').value);
+                formData.append('type', document.getElementById('data-type').value);
                 
                 try {
                     const response = await fetch('/upload', {
@@ -300,9 +349,6 @@
                     const result = await response.json();
                     alert('Data uploaded successfully!');
                     
-                    // Add new indicator checkbox
-                    addIndicatorCheckbox(result.name);
-                    
                     // Refresh the dashboard
                     window.location.reload();
                     
@@ -312,19 +358,49 @@
                 }
             });
 
-            // Add this after page load
-            function addIndicatorCheckbox(name) {
-                const checkbox = document.createElement('div');
-                checkbox.className = 'form-check form-check-inline';
-                checkbox.innerHTML = `
-                    <input class="form-check-input" type="checkbox" id="${name}-check" value="${name}" checked>
-                    <label class="form-check-label" for="${name}-check">${name}</label>
-                `;
-                document.querySelector('.indicator-controls').appendChild(checkbox);
+            // Add this after your existing DOMContentLoaded event listener
+            document.getElementById('indicator-search').addEventListener('input', function(e) {
+                const searchText = e.target.value.toLowerCase();
+                const checkboxes = document.querySelectorAll('.form-check');
                 
-                // Add event listener
-                document.getElementById(`${name}-check`).addEventListener('change', updateSectionVisibility);
+                checkboxes.forEach(checkbox => {
+                    const label = checkbox.querySelector('label').textContent.toLowerCase();
+                    if (label.includes(searchText) || searchText === '') {
+                        checkbox.style.display = 'block';
+                    } else {
+                        checkbox.style.display = 'none';
+                    }
+                });
+            });
+
+            // Add a select/deselect all function
+            function addSelectAllButtons() {
+                const buttonDiv = document.createElement('div');
+                buttonDiv.className = 'mb-2';
+                buttonDiv.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-outline-primary me-2" id="select-all">Select All</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselect-all">Deselect All</button>
+                `;
+                
+                document.getElementById('indicator-checkboxes').insertAdjacentElement('beforebegin', buttonDiv);
+                
+                document.getElementById('select-all').addEventListener('click', () => {
+                    document.querySelectorAll('.form-check-input').forEach(cb => {
+                        if (cb.parentElement.style.display !== 'none') {  // Only select visible checkboxes
+                            cb.checked = true;
+                        }
+                    });
+                    updateDashboard();
+                });
+                
+                document.getElementById('deselect-all').addEventListener('click', () => {
+                    document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
+                    updateDashboard();
+                });
             }
+
+            // Call this function in your DOMContentLoaded event
+            addSelectAllButtons();
         });
     </script>
 </body>

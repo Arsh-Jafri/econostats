@@ -1,4 +1,7 @@
 flask==3.0.0
 pandas==2.0.3
 plotly==5.18.0
-numpy==1.24.0 
+numpy==1.24.0
+fredapi==0.5.1
+python-dotenv==1.0.0
+requests-cache==1.1.0 

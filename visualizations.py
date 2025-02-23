@@ -2,6 +2,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
+from fredapi import Fred
+from fred_api import FredData
+
+# Initialize Fred API
+fred = Fred(api_key='YOUR_API_KEY')
 
 def create_time_series_plot(df, title, y_label):
     """
@@ -95,38 +100,82 @@ def create_summary_table(df):
     
     return table_html
 
-def create_dashboard_components(datasets):
+def create_dashboard_components(data_dict):
     """
     Create all visualization components for the dashboard
     """
     plots_data = {}
     tables_html = {}
     
-    # Create plots and tables for each dataset
-    for name, df in datasets.items():
+    # Create plots and tables for each available indicator
+    for indicator_id, df in data_dict.items():
         if df is not None:
-            plot = create_time_series_plot(df, name, name)
-            plots_data[name] = plot.to_dict()
-            tables_html[name] = create_summary_table(df)
+            # Get description from FredData.INDICATORS
+            description = FredData.INDICATORS.get(indicator_id, indicator_id)
+            
+            # Create plot
+            plot = create_time_series_plot(
+                df,
+                description,
+                description
+            )
+            
+            # Convert NaN to None in plot data for JSON serialization
+            plot_dict = plot.to_dict()
+            for trace in plot_dict.get('data', []):
+                if 'y' in trace:
+                    trace['y'] = [None if pd.isna(y) else y for y in trace['y']]
+            
+            plots_data[indicator_id] = plot_dict
+            
+            # Create summary table
+            tables_html[indicator_id] = create_summary_table(df)
     
     return plots_data, tables_html
 
-def create_combined_plot(datasets):
+def create_combined_plot(data_dict):
     """
     Create a combined plot with all indicators (normalized)
     """
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink']
+    # Color map for different indicators
+    colors = {
+        'CPIAUCSL': 'blue',
+        'PSAVERT': 'green',
+        'PCEC': 'red',
+        'GDPC1': 'purple',
+        'UNRATE': 'orange',
+        'FEDFUNDS': 'brown',
+        'M2SL': 'pink',
+        'GS10': 'gray',
+        'INDPRO': 'cyan',
+        'CSUSHPINSA': 'magenta',
+        'RRSFS': 'olive',
+        'UMCSENT': 'teal',
+        'CPILFESL': 'navy'
+    }
     
-    for (name, df), color in zip(datasets.items(), colors):
+    # Normalize each series (0-100 scale)
+    def normalize_series(series):
+        series = series.dropna()
+        if len(series) == 0 or series.max() == series.min():
+            return series
+        return (100 * (series - series.min()) / (series.max() - series.min())).tolist()
+    
+    # Add traces for each available indicator
+    for indicator_id, df in data_dict.items():
         if df is not None:
+            # Convert NaN to None for JSON serialization
+            y_data = normalize_series(df[indicator_id])
+            y_data = [None if pd.isna(y) else y for y in y_data]
+            
             fig.add_trace(
                 go.Scatter(
                     x=df.index.strftime('%Y-%m-%d').tolist(),
-                    y=normalize_series(df.iloc[:, 0]),
-                    name=name,
-                    line=dict(color=color)
+                    y=y_data,
+                    name=FredData.INDICATORS.get(indicator_id, indicator_id),
+                    line=dict(color=colors.get(indicator_id, 'black'))
                 ),
                 secondary_y=False
             )
@@ -138,12 +187,12 @@ def create_combined_plot(datasets):
         template='plotly_white',
         hovermode='x unified',
         height=500,
-        margin=dict(l=40, r=20, t=60, b=80),  # Adjusted margins
+        margin=dict(l=40, r=20, t=60, b=80),
         showlegend=True,
         legend=dict(
-            orientation="h",  # Horizontal legend
+            orientation="h",
             yanchor="bottom",
-            y=-0.2,  # Position below the plot
+            y=-0.2,
             xanchor="center",
             x=0.5
         ),
@@ -174,10 +223,4 @@ def filter_dataframe(df, start_date, end_date):
         return None
     
     mask = (df.index >= start_date) & (df.index <= end_date)
-    return df.loc[mask]
-
-def normalize_series(series):
-    series = series.dropna()
-    if len(series) == 0 or series.max() == series.min():
-        return series
-    return (100 * (series - series.min()) / (series.max() - series.min())).tolist() 
+    return df.loc[mask] 
