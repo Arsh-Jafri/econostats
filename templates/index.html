@@ -162,15 +162,11 @@
             <form id="upload-form" class="mb-4">
                 <div class="row g-3 align-items-center">
                     <div class="col-auto">
-                        <label for="data-type" class="col-form-label">Data Type:</label>
+                        <label for="data-name" class="col-form-label">Name:</label>
                     </div>
-                    <div class="col-auto">
-                        <select class="form-select" id="data-type" required>
-                            <option value="">Choose...</option>
-                            <option value="cpi">CPI</option>
-                            <option value="savings">Savings Rate</option>
-                            <option value="consumption">Consumption</option>
-                        </select>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="data-name" required 
+                               placeholder="Enter a name for your dataset">
                     </div>
                     <div class="col-auto">
                         <input type="file" class="form-control" id="csv-file" accept=".csv" required>
@@ -333,7 +329,7 @@
                 
                 const formData = new FormData();
                 formData.append('file', document.getElementById('csv-file').files[0]);
-                formData.append('type', document.getElementById('data-type').value);
+                formData.append('name', document.getElementById('data-name').value);
                 
                 try {
                     const response = await fetch('/upload', {

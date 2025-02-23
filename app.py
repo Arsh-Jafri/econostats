@@ -87,7 +87,7 @@ def upload_file():
             return jsonify({'error': 'No file provided'}), 400
             
         file = request.files['file']
-        data_type = request.form.get('type')
+        dataset_name = request.form.get('name')
         
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
@@ -95,12 +95,17 @@ def upload_file():
         if not allowed_file(file.filename):
             return jsonify({'error': 'Invalid file type. Please upload a CSV file'}), 400
             
-        if data_type not in ['cpi', 'savings', 'consumption']:
-            return jsonify({'error': 'Invalid data type'}), 400
+        if not dataset_name:
+            return jsonify({'error': 'Please provide a name for the dataset'}), 400
         
-        # Secure the filename and save the file
-        filename = secure_filename(file.filename)
+        # Secure the filename using the custom name
+        filename = secure_filename(f"{dataset_name}.csv")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # Check if file already exists
+        if os.path.exists(filepath):
+            return jsonify({'error': 'A dataset with this name already exists'}), 400
+        
         file.save(filepath)
         
         # Validate and process the uploaded file
@@ -109,24 +114,23 @@ def upload_file():
             
             # Basic validation
             if len(df.columns) < 2:
+                os.remove(filepath)  # Clean up invalid file
                 raise ValueError("CSV must have at least 2 columns (date and value)")
             
             # Try to parse dates
             df.iloc[:, 0] = pd.to_datetime(df.iloc[:, 0])
             
-            # Save with standardized name based on type
-            type_to_filename = {
-                'cpi': 'CPIAUCSL.csv',
-                'savings': 'PSAVERT.csv',
-                'consumption': 'PCEC.csv'
-            }
+            # Save the validated file
+            df.to_csv(filepath, index=False)
             
-            final_path = os.path.join(app.config['UPLOAD_FOLDER'], type_to_filename[data_type])
-            df.to_csv(final_path, index=False)
-            
-            return jsonify({'message': 'File uploaded successfully'}), 200
+            return jsonify({
+                'message': 'File uploaded successfully',
+                'name': dataset_name
+            }), 200
             
         except Exception as e:
+            if os.path.exists(filepath):
+                os.remove(filepath)  # Clean up on error
             return jsonify({'error': f'Error processing file: {str(e)}'}), 400
             
     except Exception as e:
