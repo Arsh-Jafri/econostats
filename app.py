@@ -83,57 +83,78 @@ def update_dashboard():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
+        print("Upload request received")
         if 'file' not in request.files:
+            print("No file in request")
             return jsonify({'error': 'No file provided'}), 400
             
         file = request.files['file']
         dataset_name = request.form.get('name')
         
+        print(f"File name: {file.filename}")
+        print(f"Dataset name: {dataset_name}")
+        
         if file.filename == '':
+            print("Empty filename")
             return jsonify({'error': 'No file selected'}), 400
             
         if not allowed_file(file.filename):
+            print("Invalid file type")
             return jsonify({'error': 'Invalid file type. Please upload a CSV file'}), 400
             
         if not dataset_name:
+            print("No dataset name provided")
             return jsonify({'error': 'Please provide a name for the dataset'}), 400
         
         # Secure the filename using the custom name
         filename = secure_filename(f"{dataset_name}.csv")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(f"Target filepath: {filepath}")
         
         # Check if file already exists
         if os.path.exists(filepath):
+            print("File already exists")
             return jsonify({'error': 'A dataset with this name already exists'}), 400
         
-        file.save(filepath)
-        
-        # Validate and process the uploaded file
+        # Read the CSV data first to validate
         try:
-            df = pd.read_csv(filepath)
+            print("Reading CSV data")
+            df = pd.read_csv(file)
+            print("CSV data shape:", df.shape)
             
             # Basic validation
             if len(df.columns) < 2:
-                os.remove(filepath)  # Clean up invalid file
+                print("Invalid number of columns")
                 raise ValueError("CSV must have at least 2 columns (date and value)")
             
-            # Try to parse dates
-            df.iloc[:, 0] = pd.to_datetime(df.iloc[:, 0])
+            # Try to parse dates from the first column
+            print("Parsing dates")
+            df.set_index(pd.to_datetime(df.iloc[:, 0]), inplace=True)
+            df = df.iloc[:, 0]  # Take only the first data column
+            df = pd.DataFrame(df)
+            df.columns = [dataset_name]
             
-            # Save the validated file
-            df.to_csv(filepath, index=False)
+            # Save the processed file
+            print("Saving processed file")
+            df.to_csv(filepath)
             
+            # Add to FredData instance
+            print("Adding to FredData instance")
+            fred.add_custom_dataset(dataset_name, df)
+            
+            print("Upload successful")
             return jsonify({
                 'message': 'File uploaded successfully',
-                'name': dataset_name
+                'name': dataset_name,
+                'description': dataset_name
             }), 200
             
         except Exception as e:
-            if os.path.exists(filepath):
-                os.remove(filepath)  # Clean up on error
+            print(f"Error processing file: {str(e)}")
             return jsonify({'error': f'Error processing file: {str(e)}'}), 400
             
     except Exception as e:
+        print(f"Unexpected error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/search_series', methods=['POST'])

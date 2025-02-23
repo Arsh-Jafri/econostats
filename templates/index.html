@@ -10,290 +10,541 @@
     <style>
         * {
             font-family: 'DM Sans', sans-serif;
+            box-sizing: border-box;
         }
         
         body {
-            background-color: #f8f9fa;
-            padding: 20px 0;
-            font-family: 'DM Sans', sans-serif;
+            background-color: #ffffff;
+            padding: 20px 20px 20px 20px;
+            margin: 0;
         }
         
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 700;
-        }
-        
-        .form-control, .form-select, .btn, .input-group-text {
-            font-family: 'DM Sans', sans-serif;
-        }
-        
-        .table {
-            font-family: 'DM Sans', sans-serif;
-        }
-        
-        .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-        .table {
-            margin-top: 20px;
-        }
-        .table th {
-            background-color: #f8f9fa;
-        }
-        .controls-panel {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .indicator-controls {
+        .header {
             display: flex;
-            gap: 20px;
             align-items: center;
-            margin-bottom: 15px;
-        }
-        .date-controls {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .form-check-input:checked {
-            background-color: #2c3e50;
-            border-color: #2c3e50;
-        }
-        .indicator-search {
-            margin-bottom: 15px;
-        }
-        
-        .form-check {
-            transition: all 0.3s ease;
-            padding: 5px;
-            border-radius: 4px;
-        }
-        
-        .form-check:hover {
-            background-color: rgba(0,0,0,0.05);
-        }
-        
-        .search-highlight {
-            background-color: yellow;
-        }
-        .logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-        
-        /* Adjust the h1 margin to account for the logo */
-        h1 {
-            margin-left: 70px;  /* Adjust based on logo size */
-        }
-        
-        /* Update logo styles */
-        .header-container {
-            position: relative;
-            padding: 20px 0;
-            margin-bottom: 30px;
+            margin-bottom: 0;
         }
         
         .logo {
             height: 40px;
             width: auto;
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
         }
         
-        .dashboard-title {
+        .main-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 0;
+        }
+        
+        .content-area {
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-top: -60px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chart-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .legend {
             text-align: center;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+        
+        .stat-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-header {
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .stat-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .stat-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        .filters-section {
+            margin-bottom: 30px;
+        }
+        
+        .filters-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .date-range {
+            margin-bottom: 24px;
+        }
+        
+        .date-range input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        
+        .search-section input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+        
+        .view-chart-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            margin-top: 12px;
+        }
+        
+        .available-datasets {
+            margin-bottom: 24px;
+        }
+        
+        .dataset-item {
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .dataset-link {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+        
+        .dataset-link:hover {
+            color: #009688;
+        }
+        
+        .sidebar h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f5f5f5;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        
+        .dataset-checkbox {
+            width: 16px;
+            height: 16px;
             margin: 0;
-            color: #2c3e50;
-            font-weight: 700;
+        }
+        
+        .currently-selected {
+            margin: 24px 0;
+        }
+        
+        .selected-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .selected-indicator:before {
+            content: "✓";
+            color: #009688;
+        }
+        
+        .remove-indicator {
+            margin-left: auto;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .remove-indicator:hover {
+            color: #d32f2f;
+        }
+        
+        .upload-button {
+            width: 100%;
+            padding: 8px;
+            background: #009688;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .upload-button:hover {
+            background: #00897b;
+        }
+        
+        .search-section {
+            margin-bottom: 24px;
+        }
+        
+        .search-section input {
+            transition: all 0.2s ease;
+        }
+        
+        .search-section input:focus {
+            outline: none;
+            border-color: #009688;
+            box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.1);
+        }
+        
+        .no-results {
+            color: #666;
+            font-style: italic;
+            padding: 8px 0;
+            display: none;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .toggle-icon {
+            font-size: 20px;
+            font-weight: bold;
+            color: #666;
+            transition: transform 0.3s ease;
+        }
+
+        .section-header.expanded .toggle-icon {
+            transform: rotate(45deg);
+        }
+
+        .selected-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .selected-content.expanded {
+            max-height: 500px; /* Adjust based on your needs */
+        }
+
+        .selected-indicator {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .selected-indicator:last-child {
+            border-bottom: none;
+        }
+
+        .upload-section {
+            margin-top: 24px;
+        }
+
+        .file-upload {
+            position: relative;
+            margin: 12px 0;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .file-input {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .file-status {
+            display: none;
+        }
+
+        .upload-button {
+            width: 100%;
+            padding: 12px;
+            background: #009688;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .upload-button:hover {
+            background: #00897b;
+        }
+
+        /* Add styles for the plot */
+        .stat-card #plot {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 16px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="header-container">
-            <img src="{{ url_for('static', filename='logo.png') }}" 
-                 alt="Econostats Logo" 
-                 class="logo">
-            <h1 class="dashboard-title">Economic Indicators Dashboard</h1>
-        </div>
+    <div class="header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Econostats Logo" class="logo">
+    </div>
 
-        <!-- Controls Panel -->
-        <div class="controls-panel">
-            <form id="filter-form" class="mb-4">
-                <div class="indicator-controls">
-                    <div class="mb-3">
-                        <strong>Search Indicators:</strong>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="indicator-search" placeholder="Search indicators...">
-                        </div>
-                    </div>
-                    <strong>Select Indicators:</strong>
-                    <div class="row mt-2" id="indicator-checkboxes">
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="CPIAUCSL-check" value="CPIAUCSL">
-                                <label class="form-check-label" for="CPIAUCSL-check">Consumer Price Index (CPIAUCSL)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="PSAVERT-check" value="PSAVERT">
-                                <label class="form-check-label" for="PSAVERT-check">Personal Savings Rate (PSAVERT)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="PCEC-check" value="PCEC">
-                                <label class="form-check-label" for="PCEC-check">Personal Consumption (PCEC)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="GDPC1-check" value="GDPC1">
-                                <label class="form-check-label" for="GDPC1-check">Real GDP (GDPC1)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="UNRATE-check" value="UNRATE">
-                                <label class="form-check-label" for="UNRATE-check">Unemployment Rate (UNRATE)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="FEDFUNDS-check" value="FEDFUNDS">
-                                <label class="form-check-label" for="FEDFUNDS-check">Federal Funds Rate (FEDFUNDS)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="M2SL-check" value="M2SL">
-                                <label class="form-check-label" for="M2SL-check">M2 Money Stock (M2SL)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="GS10-check" value="GS10">
-                                <label class="form-check-label" for="GS10-check">10-Year Treasury Rate (GS10)</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="INDPRO-check" value="INDPRO">
-                                <label class="form-check-label" for="INDPRO-check">Industrial Production (INDPRO)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="CSUSHPINSA-check" value="CSUSHPINSA">
-                                <label class="form-check-label" for="CSUSHPINSA-check">Home Price Index (CSUSHPINSA)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="RRSFS-check" value="RRSFS">
-                                <label class="form-check-label" for="RRSFS-check">Retail Sales (RRSFS)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="UMCSENT-check" value="UMCSENT">
-                                <label class="form-check-label" for="UMCSENT-check">Consumer Sentiment (UMCSENT)</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="CPILFESL-check" value="CPILFESL">
-                                <label class="form-check-label" for="CPILFESL-check">Core CPI (CPILFESL)</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="date-controls">
-                    <strong>Date Range:</strong>
-                    <div class="input-group" style="max-width: 200px;">
-                        <span class="input-group-text">From</span>
-                        <input type="date" class="form-control" id="start-date">
-                    </div>
-                    <div class="input-group" style="max-width: 200px;">
-                        <span class="input-group-text">To</span>
-                        <input type="date" class="form-control" id="end-date">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Apply Filters</button>
-                </div>
-            </form>
-            <h5 class="mb-3">Upload Custom Data</h5>
-            <form id="upload-form" class="mb-4">
-                <div class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label for="data-name" class="col-form-label">Name:</label>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" id="data-name" required 
-                               placeholder="Enter a name for your dataset">
-                    </div>
-                    <div class="col-auto">
-                        <input type="file" class="form-control" id="csv-file" accept=".csv" required>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-secondary">Upload</button>
-                    </div>
-                </div>
-                <small class="form-text text-muted">
-                    CSV file should have a date column and a value column. Dates should be in YYYY-MM-DD format.
-                </small>
-            </form>
-        </div>
-
-        <!-- Combined Plot -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="combined-plot"></div>
-                    </div>
+    <div class="main-container">
+        <div class="content-area">
+            <div class="chart-container" style="display: none;" id="main-chart-container">
+                <div id="combined-plot"></div>
+                <div class="legend">LEGEND</div>
+                <div id="no-data-message" class="no-data-message">
+                    Select datasets from the sidebar to view charts
                 </div>
             </div>
+            
+            <div class="stats-grid">
+                {% for indicator_id, description in indicators.items() %}
+                <div class="stat-card" id="{{ indicator_id }}-section" style="display: none;">
+                    <div class="stat-header">{{ indicator_id }}</div>
+                    <div id="{{ indicator_id }}-plot"></div>
+                    <table class="stat-table">
+                        <tr>
+                            <td>Statistic</td>
+                            <td>317.60</td>
+                        </tr>
+                        <tr>
+                            <td>Current Value</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>Change (YTD)</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>Change (YOY)</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>All-Time High</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>All-Time Low</td>
+                            <td>100</td>
+                        </tr>
+                    </table>
+                    <a href="#" class="view-chart-btn">View chart</a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-
-        <!-- Individual Indicators -->
-        <div class="row" id="indicators-container">
-            {% for indicator_id, description in indicators.items() %}
-            <div class="col-md-4" id="{{ indicator_id }}-section">
-                <div class="card">
-                    <div class="card-body">
-                        <div id="{{ indicator_id }}-plot"></div>
-                        <div class="mt-3" id="{{ indicator_id }}-table">
-                            {{ tables[indicator_id] | safe if tables[indicator_id] }}
-                        </div>
+        
+        <div class="sidebar">
+            <div class="filters-section">
+                <h2>Filters</h2>
+                <div class="date-range">
+                    <h3>Date range</h3>
+                    <div class="input-group">
+                        <input type="date" id="start-date" placeholder="From" class="form-input">
+                    </div>
+                    <div class="input-group">
+                        <input type="date" id="end-date" placeholder="To" class="form-input">
                     </div>
                 </div>
+                
+                <div class="currently-selected">
+                    <div class="section-header" id="selected-header">
+                        <h3>Currently selected</h3>
+                        <span class="toggle-icon">+</span>
+                    </div>
+                    <div class="selected-content" id="selected-indicators">
+                        <!-- Selected indicators will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="search-section">
+                    <h3>Search</h3>
+                    <input type="text" 
+                           id="indicator-search" 
+                           placeholder="Search for a dataset" 
+                           class="form-input"
+                           autocomplete="off">
+                </div>
+                
+                <div class="available-datasets">
+                    <h3>Available datasets</h3>
+                    <div id="available-indicators">
+                        {% for indicator_id, description in indicators.items() %}
+                        <div class="dataset-item">
+                            <label class="checkbox-label">
+                                <input type="checkbox" 
+                                       class="dataset-checkbox" 
+                                       value="{{ indicator_id }}"
+                                       data-description="{{ description }}">
+                                <span>{{ description }} ({{ indicator_id }})</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="upload-section">
+                    <h3>Upload a dataset</h3>
+                    <form id="upload-form">
+                        <input type="text" 
+                               placeholder="Dataset name" 
+                               class="form-input" 
+                               id="dataset-name">
+                        <div class="file-upload">
+                            <div class="file-input-container">
+                                <input type="file" 
+                                       id="csv-file" 
+                                       accept=".csv" 
+                                       class="file-input">
+                            </div>
+                        </div>
+                        <button type="submit" class="upload-button">Upload</button>
+                    </form>
+                </div>
             </div>
-            {% endfor %}
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Set initial date range
-            const startDate = "1947-01-01";
-            const endDate = "2024-12-01";
-            
-            document.getElementById('start-date').value = startDate;
-            document.getElementById('end-date').value = endDate;
+            // Set initial date range to past 10 years
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setFullYear(endDate.getFullYear() - 10);
 
-            // Show/hide sections based on checkboxes
-            function updateSectionVisibility() {
-                document.querySelectorAll('.form-check-input').forEach(checkbox => {
-                    const section = document.getElementById(`${checkbox.value}-section`);
-                    if (section) {
-                        section.style.display = checkbox.checked ? 'block' : 'none';
-                    }
+            // Format dates for input fields (YYYY-MM-DD)
+            document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+            document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+
+            const selectedHeader = document.getElementById('selected-header');
+            const selectedContent = document.getElementById('selected-indicators');
+
+            selectedHeader.addEventListener('click', () => {
+                selectedHeader.classList.toggle('expanded');
+                selectedContent.classList.toggle('expanded');
+            });
+
+            function updateSelectedIndicators() {
+                const selectedContainer = document.getElementById('selected-indicators');
+                selectedContainer.innerHTML = '';
+                
+                const checkedBoxes = document.querySelectorAll('.dataset-checkbox:checked');
+                
+                // Update the header to show count
+                const countSpan = document.createElement('span');
+                countSpan.className = 'selected-count';
+                countSpan.textContent = `(${checkedBoxes.length})`;
+                
+                const headerText = document.querySelector('.section-header h3');
+                headerText.textContent = 'Currently selected ';
+                headerText.appendChild(countSpan);
+                
+                checkedBoxes.forEach(checkbox => {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'selected-indicator';
+                    indicator.innerHTML = `
+                        <div class="selected-item">
+                            <span class="checkmark">✓</span>
+                            ${checkbox.dataset.description} (${checkbox.value})
+                            <span class="remove-indicator" data-id="${checkbox.value}">✕</span>
+                        </div>
+                    `;
+                    selectedContainer.appendChild(indicator);
                 });
+
+                // Add click handlers for remove buttons
+                document.querySelectorAll('.remove-indicator').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation(); // Prevent triggering the dropdown toggle
+                        const checkbox = document.querySelector(`.dataset-checkbox[value="${button.dataset.id}"]`);
+                        if (checkbox) {
+                            checkbox.checked = false;
+                            updateSelectedIndicators();
+                            updateDashboard();
+                        }
+                    });
+                });
+
+                // Show/hide the section based on whether there are selected items
+                if (checkedBoxes.length > 0) {
+                    selectedContent.style.display = 'block';
+                } else {
+                    selectedContent.style.display = 'none';
+                    headerText.textContent = 'Currently selected';
+                }
             }
 
-            // Function to update dashboard
             async function updateDashboard() {
                 // Get all indicators from checkboxes
                 const indicators = {};
-                document.querySelectorAll('.form-check-input').forEach(cb => {
+                document.querySelectorAll('.dataset-checkbox').forEach(cb => {
                     indicators[cb.value] = cb.checked;
                 });
+                
+                // Show/hide main chart container based on if any dataset is selected
+                const mainChartContainer = document.getElementById('main-chart-container');
+                const hasSelectedDatasets = Object.values(indicators).some(checked => checked);
+                mainChartContainer.style.display = hasSelectedDatasets ? 'block' : 'none';
                 
                 const filters = {
                     indicators: indicators,
@@ -321,8 +572,13 @@
                     // Update the combined plot
                     Plotly.newPlot('combined-plot', data.combined_plot.data, data.combined_plot.layout);
                     
-                    // Update individual plots
+                    // Update individual plots and sections
                     Object.keys(indicators).forEach(indicator => {
+                        const section = document.getElementById(`${indicator}-section`);
+                        if (section) {
+                            section.style.display = indicators[indicator] ? 'block' : 'none';
+                        }
+                        
                         if (indicators[indicator] && data.plots[indicator]) {
                             const plotDiv = document.getElementById(`${indicator}-plot`);
                             if (plotDiv) {
@@ -333,7 +589,6 @@
                                 );
                             }
                             
-                            // Update table if it exists
                             const tableDiv = document.getElementById(`${indicator}-table`);
                             if (tableDiv && data.tables[indicator]) {
                                 tableDiv.innerHTML = data.tables[indicator];
@@ -341,8 +596,8 @@
                         }
                     });
                     
-                    // Update visibility
-                    updateSectionVisibility();
+                    const noDataMessage = document.getElementById('no-data-message');
+                    noDataMessage.style.display = hasSelectedDatasets ? 'none' : 'block';
                     
                 } catch (error) {
                     console.error('Error updating dashboard:', error);
@@ -350,111 +605,105 @@
                 }
             }
 
-            // Add event listeners to checkboxes
-            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+            // Add change listeners to checkboxes
+            document.querySelectorAll('.dataset-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', () => {
-                    updateSectionVisibility();
+                    updateSelectedIndicators();
                     updateDashboard();
                 });
             });
 
-            // Add event listener to form
-            document.getElementById('filter-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await updateDashboard();
+            // Search functionality
+            document.getElementById('indicator-search').addEventListener('input', function(e) {
+                const searchText = e.target.value.toLowerCase();
+                document.querySelectorAll('.dataset-item').forEach(item => {
+                    const label = item.querySelector('.checkbox-label span').textContent.toLowerCase();
+                    item.style.display = label.includes(searchText) ? 'block' : 'none';
+                });
             });
 
-            // Initialize plots
-            Plotly.newPlot('combined-plot', 
-                {{ combined_plot.data | tojson }}, 
-                {{ combined_plot.layout | tojson }}
-            );
-            
-            // Initialize individual plots
-            {% for indicator_id in plots %}
-                Plotly.newPlot('{{ indicator_id }}-plot', 
-                    {{ plots[indicator_id].data | tojson }}, 
-                    {{ plots[indicator_id].layout | tojson }}
-                );
-            {% endfor %}
+            // Remove or comment out the initial plot initialization
+            function initializePlots() {
+                // Don't initialize any plots by default
+                // They will be initialized when datasets are selected
+            }
 
-            // Initial visibility update
-            updateSectionVisibility();
+            // Initialize selected indicators
+            updateSelectedIndicators();
 
-            // Add this to your existing JavaScript
             document.getElementById('upload-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
+                console.log('Upload form submitted');
+                
+                const fileInput = document.getElementById('csv-file');
+                const nameInput = document.getElementById('dataset-name');
+                
+                console.log('File:', fileInput.files[0]);
+                console.log('Dataset name:', nameInput.value);
+                
+                if (!nameInput.value) {
+                    alert('Please enter a dataset name');
+                    return;
+                }
+                
+                if (!fileInput.files[0]) {
+                    alert('Please select a file');
+                    return;
+                }
                 
                 const formData = new FormData();
-                formData.append('file', document.getElementById('csv-file').files[0]);
-                formData.append('name', document.getElementById('data-name').value);
+                formData.append('file', fileInput.files[0]);
+                formData.append('name', nameInput.value);
                 
                 try {
+                    console.log('Sending upload request...');
                     const response = await fetch('/upload', {
                         method: 'POST',
                         body: formData
                     });
                     
+                    console.log('Response status:', response.status);
+                    const responseData = await response.json();
+                    console.log('Response data:', responseData);
+                    
                     if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Upload failed');
+                        throw new Error(responseData.error || 'Upload failed');
                     }
                     
-                    const result = await response.json();
-                    alert('Data uploaded successfully!');
+                    // Add new dataset to available datasets
+                    const availableIndicators = document.getElementById('available-indicators');
+                    const newDataset = document.createElement('div');
+                    newDataset.className = 'dataset-item';
+                    newDataset.innerHTML = `
+                        <label class="checkbox-label">
+                            <input type="checkbox" 
+                                   class="dataset-checkbox" 
+                                   value="${responseData.name}"
+                                   data-description="${responseData.description}">
+                            <span>${responseData.description} (${responseData.name})</span>
+                        </label>
+                    `;
                     
-                    // Refresh the dashboard
-                    window.location.reload();
+                    // Add event listeners to new checkbox
+                    const newCheckbox = newDataset.querySelector('.dataset-checkbox');
+                    newCheckbox.addEventListener('change', () => {
+                        updateSelectedIndicators();
+                        updateDashboard();
+                    });
+                    
+                    availableIndicators.appendChild(newDataset);
+                    
+                    // Clear the form
+                    nameInput.value = '';
+                    fileInput.value = '';
+                    
+                    alert('Dataset uploaded successfully!');
                     
                 } catch (error) {
                     console.error('Upload error:', error);
                     alert(`Upload failed: ${error.message}`);
                 }
             });
-
-            // Add this after your existing DOMContentLoaded event listener
-            document.getElementById('indicator-search').addEventListener('input', function(e) {
-                const searchText = e.target.value.toLowerCase();
-                const checkboxes = document.querySelectorAll('.form-check');
-                
-                checkboxes.forEach(checkbox => {
-                    const label = checkbox.querySelector('label').textContent.toLowerCase();
-                    if (label.includes(searchText) || searchText === '') {
-                        checkbox.style.display = 'block';
-                    } else {
-                        checkbox.style.display = 'none';
-                    }
-                });
-            });
-
-            // Add a select/deselect all function
-            function addSelectAllButtons() {
-                const buttonDiv = document.createElement('div');
-                buttonDiv.className = 'mb-2';
-                buttonDiv.innerHTML = `
-                    <button type="button" class="btn btn-sm btn-outline-primary me-2" id="select-all">Select All</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselect-all">Deselect All</button>
-                `;
-                
-                document.getElementById('indicator-checkboxes').insertAdjacentElement('beforebegin', buttonDiv);
-                
-                document.getElementById('select-all').addEventListener('click', () => {
-                    document.querySelectorAll('.form-check-input').forEach(cb => {
-                        if (cb.parentElement.style.display !== 'none') {  // Only select visible checkboxes
-                            cb.checked = true;
-                        }
-                    });
-                    updateDashboard();
-                });
-                
-                document.getElementById('deselect-all').addEventListener('click', () => {
-                    document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
-                    updateDashboard();
-                });
-            }
-
-            // Call this function in your DOMContentLoaded event
-            addSelectAllButtons();
         });
     </script>
 </body>
