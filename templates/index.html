@@ -22,7 +22,8 @@
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 0;
+            margin-bottom: 20px;
+            padding-left: 320px;
         }
         
         .logo {
@@ -32,12 +33,14 @@
         
         .main-container {
             display: flex;
+            flex-direction: row-reverse;
             gap: 30px;
             margin-top: 0;
         }
         
         .content-area {
             flex: 1;
+            margin-left: 30px;
         }
         
         .sidebar {
@@ -46,12 +49,15 @@
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-top: -60px;
-            position: relative;
-            z-index: 1;
+            height: calc(100vh - 80px);
+            position: sticky;
+            top: 20px;
+            left: 0;
+            margin-top: 0;
         }
         
         .chart-container {
+            width: 100%;
             background: #ffffff;
             border-radius: 12px;
             padding: 24px;
@@ -67,8 +73,8 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
             margin-top: 24px;
         }
         
@@ -77,6 +83,8 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
         }
         
         .stat-header {
@@ -87,20 +95,35 @@
         .stat-table {
             width: 100%;
             border-collapse: collapse;
+            margin: 16px 0;
+            table-layout: fixed;
         }
         
+        .stat-table th,
         .stat-table td {
-            padding: 8px 0;
+            padding: 8px;
+            text-align: left;
             border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .stat-table th {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 50%;
         }
         
         .stat-table td:last-child {
             text-align: right;
             font-weight: 500;
+            width: 50%;
         }
         
         .filters-section {
-            margin-bottom: 30px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
         }
         
         .filters-section h2 {
@@ -196,17 +219,22 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
         
-        .selected-indicator:before {
-            content: "✓";
-            color: #009688;
+        .selected-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 14px;
         }
         
         .remove-indicator {
-            margin-left: auto;
             cursor: pointer;
             color: #666;
+            padding: 4px;
         }
         
         .remove-indicator:hover {
@@ -278,13 +306,8 @@
             max-height: 500px; /* Adjust based on your needs */
         }
 
-        .selected-indicator {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .selected-indicator:last-child {
-            border-bottom: none;
+        .selected-indicator:before {
+            content: none;
         }
 
         .upload-section {
@@ -325,11 +348,17 @@
             background: #00897b;
         }
 
-        /* Add styles for the plot */
-        .stat-card #plot {
+        /* Update plot container styles */
+        .stat-card #plot,
+        [id$="-plot"] {
             width: 100%;
-            height: 200px;
-            margin-bottom: 16px;
+            height: 300px;
+            margin: 16px 0;
+        }
+
+        /* Add styles for the plot container */
+        .plotly-graph-div {
+            width: 100% !important;
         }
 
         .no-data-message {
@@ -349,7 +378,6 @@
         <div class="content-area">
             <div class="chart-container" style="display: none;" id="main-chart-container">
                 <div id="combined-plot"></div>
-                <div class="legend">LEGEND</div>
                 <div id="no-data-message" class="no-data-message">
                     Select datasets from the sidebar to view charts
                 </div>
@@ -358,34 +386,11 @@
             <div class="stats-grid">
                 {% for indicator_id, description in indicators.items() %}
                 <div class="stat-card" id="{{ indicator_id }}-section" style="display: none;">
-                    <div class="stat-header">{{ indicator_id }}</div>
+                    <div class="stat-header">{{ description }}</div>
                     <div id="{{ indicator_id }}-plot"></div>
-                    <table class="stat-table">
-                        <tr>
-                            <td>Statistic</td>
-                            <td>317.60</td>
-                        </tr>
-                        <tr>
-                            <td>Current Value</td>
-                            <td>100</td>
-                        </tr>
-                        <tr>
-                            <td>Change (YTD)</td>
-                            <td>100</td>
-                        </tr>
-                        <tr>
-                            <td>Change (YOY)</td>
-                            <td>100</td>
-                        </tr>
-                        <tr>
-                            <td>All-Time High</td>
-                            <td>100</td>
-                        </tr>
-                        <tr>
-                            <td>All-Time Low</td>
-                            <td>100</td>
-                        </tr>
-                    </table>
+                    <div id="{{ indicator_id }}-table">
+                        <!-- Table will be dynamically populated -->
+                    </div>
                     <a href="#" class="view-chart-btn">View chart</a>
                 </div>
                 {% endfor %}
@@ -503,7 +508,6 @@
                     indicator.className = 'selected-indicator';
                     indicator.innerHTML = `
                         <div class="selected-item">
-                            <span class="checkmark">✓</span>
                             ${checkbox.dataset.description} (${checkbox.value})
                             <span class="remove-indicator" data-id="${checkbox.value}">✕</span>
                         </div>
@@ -515,7 +519,7 @@
                 document.querySelectorAll('.remove-indicator').forEach(button => {
                     button.addEventListener('click', (e) => {
                         e.preventDefault();
-                        e.stopPropagation(); // Prevent triggering the dropdown toggle
+                        e.stopPropagation();
                         const checkbox = document.querySelector(`.dataset-checkbox[value="${button.dataset.id}"]`);
                         if (checkbox) {
                             checkbox.checked = false;

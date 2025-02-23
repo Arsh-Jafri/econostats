@@ -83,32 +83,63 @@ def create_summary_table(df):
     """
     Create an HTML table with summary statistics
     """
-    # Calculate summary statistics
+    # Get the latest value
+    current_value = df.iloc[-1].values[0]
+    
+    # Calculate YTD change (from start of current year)
+    current_year = pd.Timestamp.now().year
+    year_start = pd.Timestamp(f"{current_year}-01-01")
+    ytd_value = df.loc[df.index >= year_start].iloc[0].values[0] if len(df.loc[df.index >= year_start]) > 0 else None
+    ytd_change = current_value - ytd_value if ytd_value is not None else None
+    
+    # Calculate YOY change
+    year_ago = pd.Timestamp.now() - pd.DateOffset(years=1)
+    yoy_value = df.loc[df.index <= year_ago].iloc[-1].values[0] if len(df.loc[df.index <= year_ago]) > 0 else None
+    yoy_change = current_value - yoy_value if yoy_value is not None else None
+    
+    # Calculate other statistics
+    all_time_high = df.values.max()
+    all_time_low = df.values.min()
+    average = df.values.mean()
+    
+    # Create summary DataFrame
     summary = pd.DataFrame({
         'Statistic': [
             'Current Value',
-            'Year-to-Date Change',
-            'Year-over-Year Change',
+            'YTD Change',
+            'YOY Change',
             'All-Time High',
             'All-Time Low',
-            'Average (All Time)'
+            'Average'
         ],
         'Value': [
-            f"{df.iloc[-1].values[0]:.2f}",
-            f"{(df.iloc[-1].values[0] - df.iloc[-12].values[0]):.2f}",
-            "N/A",
-            f"{df.values.max():.2f}",
-            f"{df.values.min():.2f}",
-            f"{df.values.mean():.2f}"
+            f"{current_value:.2f}",
+            f"{ytd_change:.2f}" if ytd_change is not None else "N/A",
+            f"{yoy_change:.2f}" if yoy_change is not None else "N/A",
+            f"{all_time_high:.2f}",
+            f"{all_time_low:.2f}",
+            f"{average:.2f}"
         ]
     })
     
-    # Convert to HTML with styling
-    table_html = summary.to_html(
-        classes=['table', 'table-striped', 'table-hover'],
-        index=False,
-        border=0
-    )
+    # Convert to HTML table
+    table_html = """
+    <table class="stat-table">
+        <tr>
+            <th>Statistic</th>
+            <th>Value</th>
+        </tr>
+    """
+    
+    for _, row in summary.iterrows():
+        table_html += f"""
+        <tr>
+            <td>{row['Statistic']}</td>
+            <td>{row['Value']}</td>
+        </tr>
+        """
+    
+    table_html += "</table>"
     
     return table_html
 
@@ -192,7 +223,7 @@ def create_combined_plot(data_dict):
                 secondary_y=False
             )
     
-    # Update layout with DM Sans
+    # Update layout with better legend and spacing
     fig.update_layout(
         title=dict(
             text="Combined Economic Indicators (Normalized)",
@@ -205,16 +236,34 @@ def create_combined_plot(data_dict):
         ),
         template='plotly_white',
         hovermode='x unified',
-        height=500,
-        margin=dict(l=40, r=20, t=60, b=80),
+        height=600,  # Increased height
+        margin=dict(
+            l=40,    # left margin
+            r=20,    # right margin
+            t=60,    # top margin
+            b=200    # Significantly increased bottom margin for legend
+        ),
         showlegend=True,
         legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.2,
-            xanchor="center",
+            orientation="h",     # Horizontal legend
+            yanchor="bottom",   # Anchor to bottom
+            y=-0.5,            # Moved further down
+            xanchor="center",   # Center horizontally
             x=0.5,
-            font=dict(family='DM Sans')
+            font=dict(
+                family='DM Sans',
+                size=12
+            ),
+            bgcolor='rgba(255, 255, 255, 0.9)',
+            bordercolor='rgba(0,0,0,0.1)',
+            borderwidth=1,
+            itemsizing='constant',
+            itemwidth=40,
+            itemclick=False,
+            itemdoubleclick=False,
+            traceorder="normal",
+            tracegroupgap=10,    # Added gap between legend items
+            valign="middle"
         ),
         xaxis=dict(
             title="Date",
@@ -223,8 +272,7 @@ def create_combined_plot(data_dict):
             gridcolor='rgba(211,211,211,0.5)',
             tickfont=dict(family='DM Sans'),
             title_font=dict(family='DM Sans', color='#2c3e50')
-        ),
-        font=dict(family='DM Sans')  # Set default font for all text
+        )
     )
     
     # Update axes labels with DM Sans
