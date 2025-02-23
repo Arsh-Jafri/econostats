@@ -49,15 +49,17 @@ def update_dashboard():
         fred_data = FredData()
         all_data = fred_data.get_all_indicators()
         
+        # Get smoothing parameter
+        smoothing = filters.get('smoothing', 5)  # Default to 5 if not provided
+        
         # Apply date filtering
         start_date = filters['dateRange']['start']
         end_date = filters['dateRange']['end']
         
         filtered_data = {}
         
-        # Filter each selected indicator
         for indicator_id in filters['indicators']:
-            if filters['indicators'][indicator_id]:  # If indicator is selected
+            if filters['indicators'][indicator_id]:
                 df = all_data.get(indicator_id)
                 if df is not None:
                     filtered_data[indicator_id] = filter_dataframe(df, start_date, end_date)
@@ -65,8 +67,8 @@ def update_dashboard():
         # Create plots and tables
         plots_data, tables_html = create_dashboard_components(filtered_data)
         
-        # Create combined plot
-        combined_plot = create_combined_plot(filtered_data)
+        # Create combined plot with smoothing parameter
+        combined_plot = create_combined_plot(filtered_data, smoothing=smoothing)
         
         return jsonify({
             'plots': plots_data,
@@ -75,10 +77,8 @@ def update_dashboard():
         })
         
     except Exception as e:
-        print(f"Error in update_dashboard: {str(e)}")  # Server-side logging
-        return jsonify({
-            'error': str(e)
-        }), 500
+        print(f"Error in update_dashboard: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/upload', methods=['POST'])
 def upload_file():

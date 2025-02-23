@@ -29,15 +29,15 @@ def create_time_series_plot(df, title, y_label):
         )
     )
     
-    # Customize the layout with DM Sans
+    # Customize the layout with Rubik font
     fig.update_layout(
         title=dict(
             text=title,
             x=0.5,
             font=dict(
-                family='DM Sans',
+                family='Rubik',
                 size=20,
-                color='#2c3e50'
+                color='#1E1E1E'
             )
         ),
         template='plotly_white',
@@ -51,25 +51,30 @@ def create_time_series_plot(df, title, y_label):
             y=-0.3,
             xanchor="center",
             x=0.5,
-            font=dict(family='DM Sans')
+            font=dict(
+                family='Rubik',
+                size=12
+            )
         ),
         xaxis=dict(
             title="Date",
             showgrid=True,
             gridwidth=1,
             gridcolor='rgba(211,211,211,0.5)',
-            tickfont=dict(family='DM Sans'),
-            title_font=dict(family='DM Sans', color='#2c3e50')
+            tickfont=dict(family='Rubik'),
+            title_font=dict(family='Rubik', color='#1E1E1E')
         ),
         yaxis=dict(
             title=y_label,
             showgrid=True,
             gridwidth=1,
             gridcolor='rgba(211,211,211,0.5)',
-            tickfont=dict(family='DM Sans'),
-            title_font=dict(family='DM Sans', color='#2c3e50')
+            tickfont=dict(family='Rubik'),
+            title_font=dict(family='Rubik', color='#1E1E1E')
         ),
-        font=dict(family='DM Sans')  # Set default font for all text
+        font=dict(family='Rubik'),
+        paper_bgcolor='#FCFCFC',  # Container background
+        plot_bgcolor='#FCFCFC'    # Chart background
     )
     
     # Enhance the hover information
@@ -176,7 +181,13 @@ def create_dashboard_components(data_dict):
     
     return plots_data, tables_html
 
-def create_combined_plot(data_dict):
+def smooth_series(series, window=5):
+    """
+    Smooth a series using a moving average
+    """
+    return pd.Series(series).rolling(window=window, center=True, min_periods=1).mean()
+
+def create_combined_plot(data_dict, smoothing=5):
     """
     Create a combined plot with all indicators (normalized)
     """
@@ -199,17 +210,17 @@ def create_combined_plot(data_dict):
         'CPILFESL': '#1a237e'   # Navy
     }
     
-    # Normalize each series (0-100 scale)
+    # Normalize each series (0-100 scale) without smoothing
     def normalize_series(series):
         series = series.dropna()
         if len(series) == 0 or series.max() == series.min():
             return series
-        return (100 * (series - series.min()) / (series.max() - series.min())).tolist()
+        normalized = (100 * (series - series.min()) / (series.max() - series.min()))
+        return normalized.tolist()
     
     # Add traces for each available indicator
     for indicator_id, df in data_dict.items():
         if df is not None:
-            # Convert NaN to None for JSON serialization
             y_data = normalize_series(df[indicator_id])
             y_data = [None if pd.isna(y) else y for y in y_data]
             
@@ -218,72 +229,67 @@ def create_combined_plot(data_dict):
                     x=df.index.strftime('%Y-%m-%d').tolist(),
                     y=y_data,
                     name=FredData.INDICATORS.get(indicator_id, indicator_id),
-                    line=dict(color=colors.get(indicator_id, 'black'))
+                    line=dict(
+                        color=colors.get(indicator_id, 'black'),
+                        shape='spline',  # Add curve smoothing
+                        smoothing=1.3    # Adjust smoothing factor
+                    )
                 ),
                 secondary_y=False
             )
     
-    # Update layout with better legend and spacing
+    # Update layout with Rubik font
     fig.update_layout(
         title=dict(
             text="Combined Economic Indicators (Normalized)",
             x=0.5,
             font=dict(
-                family='DM Sans',
+                family='Rubik',
                 size=24,
-                color='#2c3e50'
+                color='#1E1E1E'
             )
         ),
         template='plotly_white',
         hovermode='x unified',
-        height=600,  # Increased height
+        height=550,
         margin=dict(
-            l=40,    # left margin
-            r=20,    # right margin
-            t=60,    # top margin
-            b=200    # Significantly increased bottom margin for legend
+            l=40,
+            r=20,
+            t=60,
+            b=150
         ),
         showlegend=True,
         legend=dict(
-            orientation="h",     # Horizontal legend
-            yanchor="bottom",   # Anchor to bottom
-            y=-0.5,            # Moved further down
-            xanchor="center",   # Center horizontally
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
             x=0.5,
             font=dict(
-                family='DM Sans',
-                size=12
+                family='Rubik',
+                size=12,
+                color='#363636'
             ),
             bgcolor='rgba(255, 255, 255, 0.9)',
             bordercolor='rgba(0,0,0,0.1)',
-            borderwidth=1,
-            itemsizing='constant',
-            itemwidth=40,
-            itemclick=False,
-            itemdoubleclick=False,
-            traceorder="normal",
-            tracegroupgap=10,    # Added gap between legend items
-            valign="middle"
+            borderwidth=1
         ),
-        xaxis=dict(
-            title="Date",
-            showgrid=True,
-            gridwidth=1,
-            gridcolor='rgba(211,211,211,0.5)',
-            tickfont=dict(family='DM Sans'),
-            title_font=dict(family='DM Sans', color='#2c3e50')
+        paper_bgcolor='#FCFCFC',  # Container background
+        plot_bgcolor='#FCFCFC',   # Chart background
+        font=dict(
+            family='Rubik'
         )
     )
     
-    # Update axes labels with DM Sans
+    # Update axes labels with Rubik font
     fig.update_yaxes(
         title_text="Normalized Scale (0-100)",
         showgrid=True,
         gridwidth=1,
         gridcolor='rgba(211,211,211,0.5)',
         secondary_y=False,
-        tickfont=dict(family='DM Sans'),
-        title_font=dict(family='DM Sans', color='#2c3e50')
+        tickfont=dict(family='Rubik'),
+        title_font=dict(family='Rubik', color='#1E1E1E')
     )
     
     return fig
