@@ -40,12 +40,14 @@
             flex-direction: row;
             margin-top: 80px;
             gap: 0;
+            min-height: 100vh;  /* Ensure full height */
         }
         
         .content-area {
             flex: 1;
-            margin-left: 300px;
-            padding: 20px;
+            margin-left: 300px;  /* Match sidebar width */
+            padding: 20px 40px;  /* Increase right padding */
+            min-height: 100vh;  /* Ensure full height */
         }
         
         .sidebar {
@@ -54,11 +56,13 @@
             border-radius: 0;
             padding: 24px;
             box-shadow: none;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 80px);  /* Account for header */
             position: fixed;
             top: 80px;
             left: 0;
             margin: 0;
+            overflow-y: auto;  /* Enable scrolling */
+            z-index: 1;  /* Ensure sidebar stays above content */
             color: #363636;
         }
         
@@ -613,6 +617,21 @@
                     </div>
                 </div>
                 
+                <div class="smoothing-control">
+                    <h3>Line Thickness</h3>
+                    <div class="slider-container">
+                        <input type="range" 
+                               id="thickness-slider" 
+                               min="1" 
+                               max="8" 
+                               value="2" 
+                               class="slider">
+                        <div class="slider-value">
+                            <span id="thickness-value">2</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="currently-selected">
                     <div class="section-header" id="selected-header">
                         <h3>Currently selected</h3>
@@ -694,6 +713,9 @@
                 selectedContent.classList.toggle('expanded');
             });
 
+            let currentSmoothingValue = 5; // Default value
+            let currentThicknessValue = 2; // Default value
+
             function updateSelectedIndicators() {
                 const selectedContainer = document.getElementById('selected-indicators');
                 const checkedBoxes = document.querySelectorAll('.dataset-checkbox:checked');
@@ -769,7 +791,8 @@
                         start: document.getElementById('start-date').value,
                         end: document.getElementById('end-date').value
                     },
-                    smoothing: parseInt(document.getElementById('smooth-slider').value)
+                    smoothing: currentSmoothingValue,
+                    thickness: currentThicknessValue
                 };
                 
                 try {
@@ -787,34 +810,35 @@
                     
                     const data = await response.json();
                     
-                    // Update the combined plot
-                    Plotly.newPlot('combined-plot', data.combined_plot.data, data.combined_plot.layout);
+                    // Update combined plot
+                    if (data.combined_plot) {
+                        const combinedPlot = document.getElementById('combined-plot');
+                        // Store original data before plotting
+                        const combinedOriginalData = JSON.parse(JSON.stringify(data.combined_plot.data));
+                        Plotly.newPlot(combinedPlot, data.combined_plot.data, data.combined_plot.layout);
+                        combinedPlot._originalData = combinedOriginalData;
+                    }
                     
-                    // Store original data for smoothing
-                    const combinedPlot = document.getElementById('combined-plot');
-                    combinedPlot._originalData = JSON.parse(JSON.stringify(data.combined_plot.data));
-                    
-                    // Update individual plots and store original data
+                    // Update individual plots
                     Object.keys(indicators).forEach(indicator => {
                         const section = document.getElementById(`${indicator}-section`);
                         if (section) {
                             section.style.display = indicators[indicator] ? 'block' : 'none';
-                        }
-                        
-                        if (indicators[indicator] && data.plots[indicator]) {
-                            const plotDiv = document.getElementById(`${indicator}-plot`);
-                            if (plotDiv) {
-                                Plotly.newPlot(
-                                    `${indicator}-plot`,
-                                    data.plots[indicator].data,
-                                    data.plots[indicator].layout
-                                );
-                                plotDiv._originalData = JSON.parse(JSON.stringify(data.plots[indicator].data));
-                            }
                             
-                            const tableDiv = document.getElementById(`${indicator}-table`);
-                            if (tableDiv && data.tables[indicator]) {
-                                tableDiv.innerHTML = data.tables[indicator];
+                            if (indicators[indicator] && data.plots[indicator]) {
+                                const plotDiv = document.getElementById(`${indicator}-plot`);
+                                if (plotDiv) {
+                                    // Store original data before plotting
+                                    const originalData = JSON.parse(JSON.stringify(data.plots[indicator].data));
+                                    Plotly.newPlot(plotDiv, data.plots[indicator].data, data.plots[indicator].layout);
+                                    plotDiv._originalData = originalData;
+                                }
+                                
+                                // Update table
+                                const tableDiv = document.getElementById(`${indicator}-table`);
+                                if (tableDiv && data.tables[indicator]) {
+                                    tableDiv.innerHTML = data.tables[indicator];
+                                }
                             }
                         }
                     });
@@ -822,13 +846,13 @@
                     const noDataMessage = document.getElementById('no-data-message');
                     noDataMessage.style.display = hasSelectedDatasets ? 'none' : 'block';
                     
-                    // Apply current smoothing
-                    const smoothValue = parseInt(document.getElementById('smooth-slider').value);
-                    updateSmoothing(smoothValue);
+                    // Apply current smoothing after all plots are created
+                    if (currentSmoothingValue > 1 || currentThicknessValue !== 2) {
+                        setTimeout(() => updateSmoothing(currentSmoothingValue, currentThicknessValue), 100);
+                    }
                     
                 } catch (error) {
-                    console.error('Error updating dashboard:', error);
-                    alert('Error updating dashboard. Check console for details.');
+                    console.error('Error:', error);
                 }
             }
 
@@ -936,49 +960,51 @@
                 }
             });
 
-            // Add this function to handle smoothing updates
-            function updateSmoothing(value) {
+            // Update smoothing function to handle all plots
+            function updateSmoothing(smoothValue, thickValue) {
                 const plots = document.querySelectorAll('.plotly-graph-div');
                 plots.forEach(plot => {
-                    const plotData = plot.data;
-                    if (!plotData) return;
+                    if (!plot || !plot.data) return;
                     
-                    // Get the original data if stored, otherwise store current data
-                    if (!plot._originalData) {
-                        plot._originalData = JSON.parse(JSON.stringify(plotData));
-                    }
+                    // Skip if we don't have original data
+                    if (!plot._originalData) return;
                     
-                    // Apply smoothing to each trace
-                    plotData.forEach((trace, i) => {
-                        const originalTrace = plot._originalData[i];
-                        if (!originalTrace || !originalTrace.y) return;
-                        
-                        // Apply moving average smoothing
-                        const smoothedData = movingAverage(originalTrace.y, value);
-                        trace.y = smoothedData;
-                    });
+                    // Create new data array with smoothed values and updated thickness
+                    const newData = plot._originalData.map(trace => ({
+                        ...trace,
+                        y: movingAverage(trace.y, smoothValue),
+                        line: {
+                            color: trace.line.color,
+                            width: thickValue,
+                            shape: 'spline',
+                            smoothing: smoothValue > 1 ? 1.3 : 0
+                        }
+                    }));
                     
-                    // Update the plot without a full reload
-                    Plotly.update(plot, {y: plotData.map(trace => trace.y)});
+                    // Update the entire plot with new data
+                    Plotly.newPlot(plot, newData, plot.layout);
                 });
             }
 
-            // Add moving average function
+            // Update the moving average function for better smoothing
             function movingAverage(data, windowSize) {
+                if (!Array.isArray(data)) return data;
+                if (windowSize <= 1) return data;
+
                 const result = [];
                 for (let i = 0; i < data.length; i++) {
                     let sum = 0;
                     let count = 0;
                     
-                    // Calculate window bounds
-                    const start = Math.max(0, i - Math.floor(windowSize / 2));
-                    const end = Math.min(data.length, i + Math.floor(windowSize / 2) + 1);
+                    const halfWindow = Math.floor(windowSize / 2);
+                    const start = Math.max(0, i - halfWindow);
+                    const end = Math.min(data.length, i + halfWindow + 1);
                     
-                    // Calculate average for window
                     for (let j = start; j < end; j++) {
                         if (data[j] !== null && !isNaN(data[j])) {
-                            sum += data[j];
-                            count++;
+                            const weight = 1 - Math.abs(i - j) / windowSize;
+                            sum += data[j] * weight;
+                            count += weight;
                         }
                     }
                     
@@ -990,7 +1016,14 @@
             // Update the slider event listener
             document.getElementById('smooth-slider').addEventListener('input', function(e) {
                 document.getElementById('smooth-value').textContent = e.target.value;
-                updateSmoothing(parseInt(e.target.value));
+                currentSmoothingValue = parseInt(e.target.value);
+                updateSmoothing(currentSmoothingValue, currentThicknessValue);
+            });
+
+            document.getElementById('thickness-slider').addEventListener('input', function(e) {
+                document.getElementById('thickness-value').textContent = e.target.value;
+                currentThicknessValue = parseInt(e.target.value);
+                updateSmoothing(currentSmoothingValue, currentThicknessValue);
             });
         });
     </script>

@@ -25,7 +25,12 @@ def create_time_series_plot(df, title, y_label):
             x=x_data,
             y=y_data,
             name=y_label,
-            line=dict(color='#2c3e50', width=2)
+            line=dict(
+                color='#2c3e50', 
+                width=2,
+                shape='spline',  # Add curve smoothing
+                smoothing=1.3    # Adjust smoothing factor
+            )
         )
     )
     
@@ -231,8 +236,8 @@ def create_combined_plot(data_dict, smoothing=5):
                     name=FredData.INDICATORS.get(indicator_id, indicator_id),
                     line=dict(
                         color=colors.get(indicator_id, 'black'),
-                        shape='spline',  # Add curve smoothing
-                        smoothing=1.3    # Adjust smoothing factor
+                        shape='spline',
+                        smoothing=1.3
                     )
                 ),
                 secondary_y=False
