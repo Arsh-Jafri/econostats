@@ -175,7 +175,7 @@
             background: var(--card-bg) !important;
             border-radius: 25px;
             padding: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 40px;  /* Consistent spacing for all chart containers */
             box-shadow: none;
             overflow: hidden;
             border: 2px solid var(--border-color);
@@ -191,10 +191,10 @@
         }
         
         .stats-grid {
+            margin-top: 40px;  /* Match spacing with other sections */
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-            margin-top: 48px;
             position: relative;
             z-index: 1;  /* Lower than header */
             width: 100%;  /* Take full width of content area */
@@ -418,15 +418,27 @@
             margin-top: 32px;  /* Add top margin to create space */
         }
 
-        .toggle-icon {
-            font-size: 12px;  /* Default size for dropdown arrows */
-            color: var(--text-color);
+        /* Update toggle icon styles */
+        .section-header .toggle-icon {
+            width: 16px;
+            height: 16px;
             transition: transform 0.3s ease;
-            transform: rotate(0deg);  /* Start pointing down */
+            filter: brightness(0) saturate(100%) invert(30%);  /* Dark gray in light mode */
         }
 
+        /* Rotate icon when expanded */
         .section-header.expanded .toggle-icon {
-            transform: rotate(180deg);  /* Rotate to point up when expanded */
+            transform: rotate(180deg);
+        }
+
+        /* Dark mode icon color */
+        [data-theme="dark"] .section-header .toggle-icon {
+            filter: brightness(0) saturate(100%) invert(80%);  /* Light gray in dark mode */
+        }
+
+        /* Remove old text-based toggle styles */
+        .section-header .toggle-icon {
+            font-size: initial;  /* Remove font-size setting */
         }
 
         .selected-content {
@@ -537,6 +549,7 @@
             border-radius: 25px;
             font-family: 'Inter Tight', sans-serif !important;
             transition: all 0.3s ease;  /* Add transition */
+            margin-bottom: 0 !important;  /* Remove any plotly default margins */
         }
 
         .no-data-message {
@@ -716,6 +729,13 @@
             margin-top: 40px;
             background: var(--card-bg);
             border-top: 2px solid var(--border-color);
+            margin-right: 300px;  /* Match sidebar width */
+            transition: margin-right 0.3s ease;  /* Add transition for sidebar toggle */
+        }
+
+        /* Update footer when sidebar is hidden */
+        .footer.sidebar-hidden {
+            margin-right: 0;
         }
 
         .social-links {
@@ -926,8 +946,8 @@
 
         /* Special size for Currently Selected plus sign */
         #selected-header .toggle-icon {
-            font-size: 20px;  /* Bigger size for the plus sign */
-            font-weight: bold;
+            font-size: initial;
+            font-weight: initial;
         }
 
         /* Style for the count */
@@ -940,7 +960,7 @@
 
         /* Add these styles for the legend section */
         .legend-container {
-            margin-bottom: 32px;
+            margin-bottom: 40px;  /* Match spacing with other sections */
         }
 
         .legend-container h3 {
@@ -954,6 +974,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 16px;
+            padding: 0;  /* Remove any internal padding */
         }
 
         .legend-item {
@@ -1096,6 +1117,7 @@
         #main-chart-container {
             display: block !important;
             min-height: 400px;
+            margin-bottom: 40px !important;  /* Force consistent spacing */
         }
 
         /* Hide the plot div when no data */
@@ -1237,8 +1259,8 @@
 
         /* Style for expand chart button */
         .expand-chart-btn {
-            display: inline-flex;
-            align-items: center;
+            display: block;  /* Change to block for center alignment */
+            margin: 16px auto 0;  /* Center horizontally and reduce top margin */
             padding: 8px 16px;
             background: #f5f5f5;
             border: 1px solid var(--border-color);
@@ -1248,7 +1270,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 16px;
         }
 
         .expand-chart-btn:hover {
@@ -1319,6 +1340,10 @@
             min-height: 0;  /* Allow flex shrinking */
             border-top: none;  /* Remove top border */
         }
+
+        body.modal-open {
+            overflow: hidden;  /* Prevent body scrolling when modal is open */
+        }
     </style>
 </head>
 <body>
@@ -1381,16 +1406,16 @@
             <div class="filters-section">
                 <div class="section-header" id="design-header">
                     <h2>Chart Design</h2>
-                    <span class="toggle-icon">▼</span>
+                    <img src="{{ url_for('static', filename='dropdown.png') }}" alt="Toggle" class="toggle-icon">
                 </div>
                 <div class="design-content" id="design-controls">
                     <div class="design-controls">
                         <div class="smoothing-control">
                             <h3>Curve Smoothing</h3>
                             <div class="slider-container">
-                                <input type="range" id="smooth-slider" min="1" max="20" value="5" class="slider">
+                                <input type="range" id="smooth-slider" min="0" max="100" value="0" class="slider">
                                 <div class="slider-value">
-                                    <span id="smooth-value">5</span>
+                                    <span id="smooth-value">0</span>
                                 </div>
                             </div>
                         </div>
@@ -1476,8 +1501,8 @@
                 
                 <div class="currently-selected">
                     <div class="section-header" id="selected-header">
-                        <h3>Currently selected</h3>
-                        <span class="toggle-icon">+</span>
+                        <h3>Currently selected (<span class="selected-count">0</span>)</h3>
+                        <img src="{{ url_for('static', filename='dropdown.png') }}" alt="Toggle" class="toggle-icon">
                     </div>
                     <div class="selected-content" id="selected-indicators">
                         <!-- Selected indicators will be dynamically added here -->
@@ -1571,8 +1596,9 @@
                 selectedContent.classList.toggle('expanded');
             });
 
-            let currentSmoothingValue = 5; // Default value
-            let currentThicknessValue = 2; // Default value
+            // Initialize with default values
+            let currentSmoothingValue = 0;  // Start with no smoothing
+            let currentThicknessValue = 2;  // Default line thickness
             let currentTheme = 'default';
 
             function showLoading() {
@@ -1739,7 +1765,10 @@
                         }
                     });
                     
-                    // Apply current smoothing after all plots are created
+                    // After all plots are created, store original data
+                    storeOriginalData();
+                    
+                    // Apply current smoothing if needed
                     if (currentSmoothingValue > 1 || currentThicknessValue !== 2) {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         await updateSmoothing(currentSmoothingValue, currentThicknessValue);
@@ -1923,31 +1952,51 @@
                 }
             });
 
-            // Update smoothing function to handle all plots
+            // Update the smoothing function to handle 0-100 range
             async function updateSmoothing(smoothValue, thickValue) {
-                showLoading();  // Show loading at start
+                showLoading();
                 try {
-                    const plots = document.querySelectorAll('.plotly-graph-div');
-                    for (const plot of plots) {
-                        if (!plot || !plot.data) continue;
-                        if (!plot._originalData) continue;
+                    const mainPlot = document.getElementById('combined-plot');
+                    const subPlots = document.querySelectorAll('.stat-card [id$="-plot"]');
+                    const allPlots = [mainPlot, ...subPlots];
+                    
+                    // Convert 0-100 range to effective window size (1-20)
+                    const effectiveWindow = smoothValue === 0 ? 1 : Math.max(1, Math.round((smoothValue / 100) * 19) + 1);
+                    
+                    for (const plot of allPlots) {
+                        if (!plot || !plot.data || !plot._originalData) continue;
                         
                         const newData = plot._originalData.map(trace => ({
                             ...trace,
-                            y: movingAverage(trace.y, smoothValue),
+                            y: movingAverage(trace.y, effectiveWindow),
                             line: {
-                                color: trace.line.color,
+                                ...trace.line,
                                 width: thickValue,
-                                shape: 'spline',
-                                smoothing: smoothValue > 1 ? 1.3 : 0
+                                shape: smoothValue > 0 ? 'spline' : 'linear',
+                                smoothing: smoothValue > 0 ? 1.3 : 0
                             }
                         }));
                         
                         await Plotly.newPlot(plot, newData, plot.layout);
                     }
+                } catch (error) {
+                    console.error('Error updating smoothing:', error);
                 } finally {
-                    hideLoading();  // Hide loading when done
+                    hideLoading();
                 }
+            }
+
+            // Make sure original data is stored for all plots
+            function storeOriginalData() {
+                const mainPlot = document.getElementById('combined-plot');
+                const subPlots = document.querySelectorAll('.stat-card [id$="-plot"]');
+                const allPlots = [mainPlot, ...subPlots];
+                
+                allPlots.forEach(plot => {
+                    if (plot && plot.data) {
+                        plot._originalData = JSON.parse(JSON.stringify(plot.data));
+                    }
+                });
             }
 
             // Update the moving average function for better smoothing
@@ -2106,6 +2155,7 @@
                 contentArea.classList.toggle('sidebar-hidden');
                 header.classList.toggle('sidebar-hidden');
                 sidebarToggle.classList.toggle('sidebar-hidden');
+                document.querySelector('.footer').classList.toggle('sidebar-hidden');  // Add this line
                 
                 // Wait for CSS transitions to complete
                 setTimeout(() => {
@@ -2221,11 +2271,14 @@
                 });
             }
 
-            // Add click handler for expand button
+            // Update expand button click handler
             document.querySelectorAll('.expand-chart-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const plotDiv = this.closest('.stat-card').querySelector('[id$="-plot"]');
                     if (!plotDiv) return;
+
+                    // Add class to body to prevent scrolling
+                    document.body.classList.add('modal-open');
 
                     // Create modal for expanded chart
                     const modal = document.createElement('div');
@@ -2306,6 +2359,7 @@
                         if (e.target === modal) {
                             modal.remove();
                             modalStyles.remove();
+                            document.body.classList.remove('modal-open');
                         }
                     });
 
@@ -2343,6 +2397,7 @@
                     modal.querySelector('.chart-modal-close').onclick = () => {
                         modal.remove();
                         modalStyles.remove();
+                        document.body.classList.remove('modal-open');
                     };
                 });
             });
