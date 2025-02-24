@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/logo-white.png" alt="Econostats Logo" width="600"/>
+  <img src="static/logo-white.png" alt="Econostats Logo" width="500"/>
 </p>
 
 <h1 align="center"><a href="https://econostats.co">econostats.co</a></h1>
@@ -27,7 +27,6 @@ Econostats is a dynamic web application designed to visualize and analyze key ec
 - HTML5/CSS3
 - JavaScript
 - Plotly.js for interactive charts
-- Inter Tight font family for modern typography
 
 ### Backend
 - Python 3.11
@@ -90,9 +89,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Author
+## Creator
 
 Created by [Arsh Jafri](https://github.com/Arsh-Jafri)
+- [LinkedIn](https://www.linkedin.com/in/arshjafri/)
+- [GitHub](https://github.com/Arsh-Jafri)
 
 ## Acknowledgments
 
