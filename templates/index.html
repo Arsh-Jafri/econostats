@@ -242,6 +242,10 @@
             width: 50%;
         }
         
+        .stat-table th:last-child {
+            text-align: right;  /* Right align the "Value" header */
+        }
+        
         .stat-table td:last-child {
             text-align: right;
             font-weight: 500;
@@ -257,9 +261,9 @@
         }
         
         .filters-section h2 {
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-color);
-            font-size: 24px;
             margin-bottom: 16px;
         }
         
@@ -288,7 +292,7 @@
             display: inline-block;
             padding: 8px 16px;
             background: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 24px;
             text-decoration: none;
             color: var(--text-color);
             margin-top: 12px;
@@ -328,14 +332,17 @@
         }
         
         .dataset-name {
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-color);
             margin-bottom: 2px;
         }
         
         .dataset-id {
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 400;
             color: var(--text-color);
+            opacity: 0.8;
         }
         
         .selected-indicator {
@@ -371,7 +378,7 @@
             background: #009688;
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 24px;
             cursor: pointer;
             margin-top: 8px;
         }
@@ -486,7 +493,7 @@
             background: #009688;
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 24px;
             cursor: pointer;
             font-family: 'Inter Tight', sans-serif;
             font-size: 16px;
@@ -500,7 +507,7 @@
         /* Style the file input text */
         .file-input::file-selector-button {
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 24px;
             border: none;
             background: #f5f5f5;  /* Light gray background in light mode */
             color: var(--text-color);
@@ -534,9 +541,39 @@
 
         .no-data-message {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
             color: var(--text-color);
-            font-style: italic;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .no-data-message h3 {
+            font-size: 32px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .no-data-message p {
+            font-size: 16px;
+            line-height: 1.5;  /* Add line height */
+            margin: 0;  /* Remove default margins */
+            color: var(--text-color);
+            opacity: 0.8;
+            font-style: normal;
+        }
+
+        .no-data-message p:first-of-type {
+            margin-bottom: 8px;  /* Add space between paragraphs */
+        }
+
+        .no-data-message p:last-of-type {
+            margin-bottom: 24px;  /* Space before buttons */
         }
 
         /* Update combined plot styles */
@@ -587,9 +624,8 @@
         }
 
         .slider-value {
-            min-width: 24px;
-            text-align: right;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
             color: var(--text-color);
         }
 
@@ -616,80 +652,18 @@
 
         /* Update specific elements */
         .sidebar h2 {  /* Main "Filters" heading */
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 16px;  /* Reduced from 24px */
+            margin-bottom: 16px;
         }
 
         .sidebar h3 {  /* Section headings */
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-color);
-            margin-bottom: 8px;  /* Reduced from 12px */
-            margin-top: 16px;  /* Reduced from 24px */
-        }
-
-        .section-header h3 {
-            /* Remove any specific overrides */
-        }
-
-        .filters-section h2 {
-            /* Remove any specific overrides */
-        }
-
-        .filters-section h3 {
-            /* Remove any specific overrides */
-        }
-
-        .stat-header {
-            /* Remove any specific overrides */
-        }
-
-        .stat-table th {
-            /* Remove any specific overrides */
-        }
-
-        .stat-table td {
-            /* Remove any specific overrides */
-        }
-
-        .selected-item {
-            /* Remove any specific overrides */
-        }
-
-        .checkbox-label {
-            /* Remove any specific overrides */
-        }
-
-        .no-data-message {
-            /* Remove any specific overrides */
-        }
-
-        .slider-value {
-            /* Remove any specific overrides */
-        }
-
-        .no-datasets-message {
-            /* Remove any specific overrides */
-        }
-
-        .dataset-item span {
-            /* Remove any specific overrides */
-        }
-
-        .selected-indicator {
-            /* Remove any specific overrides */
-        }
-
-        /* Update heading styles */
-        .sidebar h2 {  /* Main "Filters" heading */
-            /* Remove any specific overrides */
-        }
-
-        .sidebar h3,  /* Section headings */
-        .section-header h3 {
-            /* Remove any specific overrides */
+            margin-bottom: 8px;
+            margin-top: 16px;
         }
 
         /* Remove any conflicting styles */
@@ -834,7 +808,7 @@
             gap: 4px;  /* Decreased from 8px */
             padding: 8px;  /* Decreased from 12px */
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -865,7 +839,8 @@
         }
 
         .theme-name {
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
             color: var(--text-color);
         }
 
@@ -913,7 +888,7 @@
             margin-top: 12px;
             background: #f5f5f5;  /* Light gray background in light mode */
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 24px;
             color: var(--text-color);
             cursor: pointer;
             font-family: 'Inter Tight', sans-serif;
@@ -957,8 +932,10 @@
 
         /* Style for the count */
         .selected-count {
+            font-size: 14px;
+            font-weight: 400;
             color: var(--text-color);
-            font-weight: normal;
+            opacity: 0.8;
         }
 
         /* Add these styles for the legend section */
@@ -1114,6 +1091,234 @@
         .js-plotly-plot .main-svg {
             background: inherit !important;
         }
+
+        /* Update the main chart container section */
+        #main-chart-container {
+            display: block !important;
+            min-height: 400px;
+        }
+
+        /* Hide the plot div when no data */
+        #combined-plot {
+            display: none;
+        }
+
+        #combined-plot.has-data {
+            display: block;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .cta-btn {
+            padding: 12px 24px;
+            border-radius: 18px;
+            font-family: 'Inter Tight', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-weight: 600;  /* Increase font weight for all action buttons */
+        }
+
+        .fred-btn {
+            background: #009688;
+            color: white;
+            font-weight: 600;
+        }
+
+        .fred-btn:hover {
+            background: #00897b;
+        }
+
+        .upload-btn {
+            background: #f5f5f5;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .upload-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Update chart container to always show */
+        #main-chart-container {
+            display: block !important;
+            min-height: 400px;
+        }
+
+        /* Hide the plot div when no data */
+        #combined-plot {
+            display: none;
+        }
+
+        #combined-plot.has-data {
+            display: block;
+        }
+
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            animation: spin 3s linear infinite;  /* Changed from 5s to 3s for faster spin */
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Reset field border radius back to original */
+        .file-upload,
+        .search-section input,
+        .date-range input,
+        .upload-section input[type="text"] {
+            border-radius: 16px;  /* Back to original */
+        }
+
+        /* Update button border radius (from 24px to 18px) */
+        .cta-btn,
+        .upload-button,
+        .view-all-btn,
+        .file-input::file-selector-button {
+            border-radius: 18px;  /* Reduced by 25% from 24px */
+        }
+
+        /* Update dark mode styles for upload button */
+        [data-theme="dark"] .upload-btn,
+        [data-theme="dark"] .file-input::file-selector-button {
+            background: #404040;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .upload-btn:hover,
+        [data-theme="dark"] .file-input::file-selector-button:hover {
+            background: #505050;
+        }
+
+        /* Update button text weight */
+        .cta-btn,
+        .upload-button,
+        .view-all-btn,
+        .file-input::file-selector-button {
+            font-weight: 600;  /* Increase font weight for all action buttons */
+        }
+
+        /* Update specific button styles to maintain weight */
+        .fred-btn {
+            background: #009688;
+            color: white;
+            font-weight: 600;
+        }
+
+        .upload-btn {
+            background: #f5f5f5;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        /* Keep font weight in dark mode */
+        [data-theme="dark"] .upload-btn,
+        [data-theme="dark"] .file-input::file-selector-button {
+            background: #404040;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Style for expand chart button */
+        .expand-chart-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            color: var(--text-color);
+            font-family: 'Inter Tight', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 16px;
+        }
+
+        .expand-chart-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Dark mode styles for expand button */
+        [data-theme="dark"] .expand-chart-btn {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .expand-chart-btn:hover {
+            background: #505050;
+        }
+
+        /* Update modal styles for better sizing */
+        .chart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 40px;  /* Add padding around modal */
+        }
+
+        .chart-modal-content {
+            background: var(--card-bg);
+            padding: 32px;  /* Increase padding */
+            border-radius: 25px;
+            width: 95%;  /* Slightly wider */
+            max-width: 1400px;  /* Increased max-width */
+            position: relative;
+            height: 90vh;  /* Set height relative to viewport */
+            display: flex;
+            flex-direction: column;
+            border: none;  /* Remove any borders */
+        }
+
+        .chart-modal-close {
+            position: absolute;
+            right: 32px;  /* Match new padding */
+            top: 32px;    /* Match new padding */
+            font-size: 28px;  /* Slightly larger close button */
+            cursor: pointer;
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .chart-modal-close:hover {
+            background: var(--hover-bg);
+        }
+
+        .expanded-chart {
+            flex: 1;  /* Take remaining space */
+            width: 100%;
+            min-height: 0;  /* Allow flex shrinking */
+            border-top: none;  /* Remove top border */
+        }
     </style>
 </head>
 <body>
@@ -1131,10 +1336,21 @@
 
     <div class="main-container">
         <div class="content-area">
-            <div class="chart-container" style="display: none;" id="main-chart-container">
+            <div class="chart-container" id="main-chart-container">
                 <div id="combined-plot" class="plotly-graph-div main-plot"></div>
                 <div id="no-data-message" class="no-data-message">
-                    Select datasets from the sidebar to view charts
+                    <img src="{{ url_for('static', filename='circlelogo.png') }}" alt="Econostats Logo" class="welcome-logo">
+                    <h3>Welcome to Econostats</h3>
+                    <p>A real-time economic data visualization platform that helps you track and analyze key economic indicators.</p>
+                    <p>Get started by exploring Federal Reserve (FRED) datasets or uploading your own .csv data.</p>
+                    <div class="cta-buttons">
+                        <button class="cta-btn fred-btn" onclick="document.querySelector('.available-datasets').scrollIntoView({behavior: 'smooth'})">
+                            Select FRED data
+                        </button>
+                        <button class="cta-btn upload-btn" onclick="document.querySelector('.upload-section').scrollIntoView({behavior: 'smooth'})">
+                            Upload dataset
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -1153,7 +1369,9 @@
                     <div id="{{ indicator_id }}-table">
                         <!-- Table will be dynamically populated -->
                     </div>
-                    <a href="#" class="view-chart-btn">View chart</a>
+                    <button class="expand-chart-btn">
+                        <span>Expand chart</span>
+                    </button>
                 </div>
                 {% endfor %}
             </div>
@@ -1431,8 +1649,13 @@
                     
                     // Show/hide main chart container based on if any dataset is selected
                     const mainChartContainer = document.getElementById('main-chart-container');
+                    const combinedPlot = document.getElementById('combined-plot');
+                    const noDataMessage = document.getElementById('no-data-message');
                     const hasSelectedDatasets = Object.values(indicators).some(checked => checked);
-                    mainChartContainer.style.display = hasSelectedDatasets ? 'block' : 'none';
+                    
+                    // Show/hide appropriate elements
+                    combinedPlot.style.display = hasSelectedDatasets ? 'block' : 'none';
+                    noDataMessage.style.display = hasSelectedDatasets ? 'none' : 'block';
                     
                     const filters = {
                         indicators: indicators,
@@ -1516,9 +1739,6 @@
                         }
                     });
                     
-                    const noDataMessage = document.getElementById('no-data-message');
-                    noDataMessage.style.display = hasSelectedDatasets ? 'none' : 'block';
-                    
                     // Apply current smoothing after all plots are created
                     if (currentSmoothingValue > 1 || currentThicknessValue !== 2) {
                         await new Promise(resolve => setTimeout(resolve, 100));
@@ -1565,7 +1785,8 @@
                                 font: {
                                     color: textColor,
                                     family: 'Inter Tight',
-                                    size: 24
+                                    size: 24,
+                                    weight: 700
                                 }
                             },
                             xaxis: {
@@ -1960,7 +2181,8 @@
                                 font: {
                                     color: textColor,
                                     family: 'Inter Tight',
-                                    size: 24
+                                    size: 24,
+                                    weight: 700
                                 }
                             },
                             showlegend: false,
@@ -1998,6 +2220,132 @@
                     }
                 });
             }
+
+            // Add click handler for expand button
+            document.querySelectorAll('.expand-chart-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const plotDiv = this.closest('.stat-card').querySelector('[id$="-plot"]');
+                    if (!plotDiv) return;
+
+                    // Create modal for expanded chart
+                    const modal = document.createElement('div');
+                    modal.className = 'chart-modal';
+                    modal.innerHTML = `
+                        <div class="chart-modal-content">
+                            <div class="modal-header">
+                                <div class="modal-title"></div>
+                                <div class="chart-modal-close">×</div>
+                            </div>
+                            <div class="expanded-chart"></div>
+                        </div>
+                    `;
+
+                    // Update modal styles
+                    const modalStyles = document.createElement('style');
+                    modalStyles.textContent = `
+                        .chart-modal {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0,0,0,0.5);
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 1000;
+                        }
+                        .chart-modal-content {
+                            background: var(--card-bg);
+                            padding: 32px;
+                            border-radius: 25px;
+                            width: 95%;
+                            max-width: 1400px;
+                            position: relative;
+                            height: 90vh;
+                            display: flex;
+                            flex-direction: column;
+                            border: none;  /* Remove any borders */
+                        }
+                        .modal-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 24px;
+                            width: 100%;
+                            border: none;  /* Remove any borders */
+                        }
+                        .chart-modal-close {
+                            font-size: 28px;
+                            cursor: pointer;
+                            color: var(--text-color);
+                            width: 40px;
+                            height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border-radius: 50%;
+                            transition: background-color 0.2s ease;
+                            background: var(--card-bg);
+                            z-index: 1001;
+                        }
+                        .chart-modal-close:hover {
+                            background: var(--hover-bg);
+                        }
+                        .expanded-chart {
+                            flex: 1;
+                            width: 100%;
+                            min-height: 0;
+                            border-top: none;  /* Remove top border */
+                        }
+                    `;
+                    document.head.appendChild(modalStyles);
+
+                    // Add click-off functionality
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            modal.remove();
+                            modalStyles.remove();
+                        }
+                    });
+
+                    // Add modal to body
+                    document.body.appendChild(modal);
+
+                    // Copy plot data and update layout
+                    const newData = plotDiv._originalData || plotDiv.data;
+                    const newLayout = {
+                        ...plotDiv.layout,
+                        autosize: true,
+                        height: null,
+                        width: null,
+                        margin: {
+                            l: 60,    /* Increased margins */
+                            r: 40,
+                            t: 80,
+                            b: 60
+                        },
+                        title: {
+                            text: plotDiv.closest('.stat-card').querySelector('.stat-header').textContent,
+                            font: {
+                                family: 'Inter Tight',
+                                size: 28,  /* Larger title */
+                                weight: 700,
+                                color: isDarkMode ? '#ffffff' : '#1E1E1E'
+                            }
+                        }
+                    };
+
+                    // Create new plot in modal
+                    Plotly.newPlot(modal.querySelector('.expanded-chart'), newData, newLayout);
+
+                    // Add close handler
+                    modal.querySelector('.chart-modal-close').onclick = () => {
+                        modal.remove();
+                        modalStyles.remove();
+                    };
+                });
+            });
         });
     </script>
 </body>
