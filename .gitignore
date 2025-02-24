@@ -1,4 +1,38 @@
+# Environment variables and secrets
 .env
+.env.example
+
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
 .venv/
-uploads/ 
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# AWS Elastic Beanstalk
+.elasticbeanstalk/
+.ebextensions/*.config.old
+.ebextensions/*.config.bak
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Application specific
+uploads/
+fred_cache.sqlite
+*.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/ 
