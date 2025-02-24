@@ -89,9 +89,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Author
+## Creator
 
 Created by [Arsh Jafri](https://github.com/Arsh-Jafri)
+- [LinkedIn](https://www.linkedin.com/in/arshjafri/)
+- [GitHub](https://github.com/Arsh-Jafri)
 
 ## Acknowledgments
 
