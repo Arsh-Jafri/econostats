@@ -21,12 +21,20 @@ Econostats is a dynamic web application designed to visualize and analyze key ec
 - **Responsive Design**: Optimized for desktop viewing with mobile-friendly warning system
 - **Dark/Light Mode**: Toggle between themes for comfortable viewing
 
+## Data Management
+
+- **FRED API**: Real-time economic data fetching
+- **Pandas DataFrames**: In-memory data processing
+- **CSV Storage**: Local storage for custom uploaded datasets
+- **Requests Cache**: SQLite-based caching for API responses
+
 ## Tech Stack
 
 ### Frontend
 - HTML5/CSS3
 - JavaScript
 - Plotly.js for interactive charts
+- Inter Tight font family
 
 ### Backend
 - Python 3.11
@@ -34,6 +42,7 @@ Econostats is a dynamic web application designed to visualize and analyze key ec
 - Pandas for data manipulation
 - NumPy for numerical computations
 - FRED API for economic data
+- Requests-cache for API response caching
 - Gunicorn WSGI server
 
 ### Deployment
