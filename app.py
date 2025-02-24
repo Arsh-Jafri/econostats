@@ -29,18 +29,15 @@ def load_all_datasets():
 
 @app.route('/')
 def index():
+    # Initialize FredData instance
     fred_data = FredData()
-    indicators = fred_data.get_indicator_info()
-    data = fred_data.get_all_indicators()
-    
-    plots_data, tables_html = create_dashboard_components(data)
-    combined_plot = create_combined_plot(data)
-    
-    return render_template('index.html',
-                         plots=plots_data,
-                         tables=tables_html,
-                         combined_plot=combined_plot.to_dict(),
-                         indicators=indicators)
+    data = fred_data.get_all_indicators()  # Changed from get_all_data() to match your API
+    combined_plot, plots, tables = create_dashboard_components(data)
+    return render_template('index.html', 
+                         indicators=FredData.INDICATORS,
+                         combined_plot=combined_plot,
+                         plots=plots,
+                         tables=tables)
 
 @app.route('/update_dashboard', methods=['POST'])
 def update_dashboard():
@@ -49,31 +46,28 @@ def update_dashboard():
         fred_data = FredData()
         all_data = fred_data.get_all_indicators()
         
-        # Get smoothing parameter
-        smoothing = filters.get('smoothing', 5)  # Default to 5 if not provided
+        # Get parameters
+        smoothing = filters.get('smoothing', 5)
+        theme = filters.get('theme', 'default')
         
         # Apply date filtering
         start_date = filters['dateRange']['start']
         end_date = filters['dateRange']['end']
         
         filtered_data = {}
-        
         for indicator_id in filters['indicators']:
             if filters['indicators'][indicator_id]:
                 df = all_data.get(indicator_id)
                 if df is not None:
                     filtered_data[indicator_id] = filter_dataframe(df, start_date, end_date)
         
-        # Create plots and tables
-        plots_data, tables_html = create_dashboard_components(filtered_data)
-        
-        # Create combined plot with smoothing parameter
-        combined_plot = create_combined_plot(filtered_data, smoothing=smoothing)
+        # Create plots with theme
+        combined_plot, plots, tables = create_dashboard_components(filtered_data, theme=theme)
         
         return jsonify({
-            'plots': plots_data,
-            'tables': tables_html,
-            'combined_plot': combined_plot.to_dict()
+            'plots': plots,
+            'tables': tables,
+            'combined_plot': combined_plot
         })
         
     except Exception as e:

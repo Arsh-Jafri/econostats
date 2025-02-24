@@ -8,9 +8,10 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: 'Rubik', sans-serif;
+            font-family: 'Inter Tight', sans-serif;
             box-sizing: border-box;
         }
         
@@ -23,58 +24,90 @@
         .header {
             display: flex;
             align-items: center;
-            padding: 20px;
-            position: fixed;
+            justify-content: space-between;
+            padding: 16px 20px;
+            position: sticky;
             top: 0;
             left: 0;
-            z-index: 2;
+            z-index: 10;
+            width: calc(100% - 300px);  /* Match exactly with sidebar width */
+            background: #ffffff;
+            transition: width 0.3s ease;
+            box-shadow: none;  /* Remove shadow */
+            border-bottom: 2px solid #E8E8E8;  /* Optional: add subtle border instead */
+        }
+        
+        .header.sidebar-hidden {
+            width: 100%;  /* Take full width when sidebar is hidden */
         }
         
         .logo {
-            height: 40px;
+            height: 40px;  /* Reduced from 60px */
             width: auto;
         }
         
         .main-container {
             display: flex;
             flex-direction: row;
-            margin-top: 80px;
+            margin-top: 0;  /* Remove margin since header is sticky now */
             gap: 0;
-            min-height: 100vh;  /* Ensure full height */
+            min-height: 100vh;
         }
         
         .content-area {
             flex: 1;
-            margin-left: 300px;  /* Match sidebar width */
-            padding: 20px 40px;  /* Increase right padding */
-            min-height: 100vh;  /* Ensure full height */
+            margin-right: 300px;
+            margin-left: 0;
+            padding: 20px 40px;
+            min-height: 100vh;
+            transition: margin-right 0.3s ease;
+            z-index: 1;
+        }
+        
+        .content-area.sidebar-hidden {
+            margin-right: 0;  /* Remove margin when sidebar is hidden */
         }
         
         .sidebar {
             width: 300px;
             background: #FCFCFC;
             border-radius: 0;
-            padding: 24px;
+            padding: 16px;  /* Reduced from 24px */
             box-shadow: none;
-            height: calc(100vh - 80px);  /* Account for header */
+            height: 100vh;
             position: fixed;
-            top: 80px;
-            left: 0;
+            top: 0;
+            right: 0;
+            left: auto;
             margin: 0;
-            overflow-y: auto;  /* Enable scrolling */
-            z-index: 1;  /* Ensure sidebar stays above content */
+            overflow: hidden;  /* Changed from overflow-y: auto */
+            z-index: 20;  /* Higher than header */
             color: #363636;
+            border-left: 2px solid #E8E8E8;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
+        }
+        
+        .sidebar.hidden {
+            transform: translateX(100%);  /* Slide out to the right */
         }
         
         .chart-container {
-            margin-left: 20px;
+            margin-right: 0;
+            margin-left: 0;
             width: 100%;
             background: #FCFCFC;
-            border-radius: 17px;
+            border-radius: 25px;
             padding: 24px;
-            margin-bottom: 48px;
+            margin-bottom: 32px;
             box-shadow: none;
             overflow: hidden;
+            border: 2px solid #E8E8E8;
+            position: relative;
+            z-index: 1;
+            transition: width 0.3s ease;  /* Add transition */
         }
         
         .legend {
@@ -85,21 +118,23 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-top: 48px;
             position: relative;
-            z-index: 1;
+            z-index: 1;  /* Lower than header */
+            width: 100%;  /* Take full width of content area */
         }
         
         .stat-card {
+            width: 100%;  /* Take full width of grid cell */
             background: #ffffff;
-            border-radius: 17px;
+            border-radius: 25px;
             padding: 20px;
             box-shadow: none;
             overflow: hidden;
-            width: 100%;
             color: #363636;
+            border: 2px solid #E8E8E8;
         }
         
         .stat-header {
@@ -140,9 +175,11 @@
         }
         
         .filters-section {
-            max-height: calc(100vh - 120px);
+            flex: 1;
             overflow-y: auto;
             background: #FCFCFC;
+            padding-right: 16px;
+            padding-bottom: 24px;  /* Add padding at bottom */
         }
         
         .filters-section h2 {
@@ -153,22 +190,22 @@
         }
         
         .date-range {
-            margin-bottom: 24px;
+            margin-bottom: 24px;  /* Reduced from 32px */
         }
         
         .date-range input {
             width: 100%;
             padding: 8px;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-top: 8px;
+            border-radius: 16px;
+            margin-top: 4px;  /* Reduced from 8px */
         }
         
         .search-section input {
             width: 100%;
             padding: 8px;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 16px;
             background: #ffffff;
             color: #363636;
         }
@@ -188,7 +225,7 @@
         }
         
         .available-datasets {
-            margin-bottom: 24px;
+            margin-bottom: 24px;  /* Reduced from 32px */
         }
         
         .dataset-item {
@@ -246,6 +283,12 @@
             color: #666;
             padding: 4px;
             margin-top: 2px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .remove-indicator:hover {
+            color: #333;
         }
         
         .upload-button {
@@ -254,7 +297,7 @@
             background: #009688;
             color: white;
             border: none;
-            border-radius: 11px;
+            border-radius: 16px;
             cursor: pointer;
             margin-top: 8px;
         }
@@ -264,7 +307,7 @@
         }
         
         .search-section {
-            margin-bottom: 24px;
+            margin-bottom: 24px;  /* Reduced from 32px */
         }
         
         .search-section input {
@@ -290,17 +333,19 @@
             align-items: center;
             cursor: pointer;
             padding: 8px 0;
+            margin-bottom: 16px;
+            margin-top: 32px;  /* Add top margin to create space */
         }
 
         .toggle-icon {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 12px;  /* Default size for dropdown arrows */
             color: #666;
             transition: transform 0.3s ease;
+            transform: rotate(0deg);  /* Start pointing down */
         }
 
         .section-header.expanded .toggle-icon {
-            transform: rotate(45deg);
+            transform: rotate(180deg);  /* Rotate to point up when expanded */
         }
 
         .selected-content {
@@ -318,25 +363,47 @@
         }
 
         .upload-section {
-            margin-top: 24px;
+            margin-bottom: 32px;
+        }
+
+        .upload-section input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #363636;
+            font-family: 'Inter Tight', sans-serif;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .upload-section input[type="text"]:focus {
+            outline: none;
+            border-color: #009688;
+            box-shadow: 0 0 0 2px rgba(0, 150, 136, 0.1);
         }
 
         .file-upload {
-            position: relative;
-            margin: 12px 0;
+            width: 100%;
+            padding: 12px;
             background: #ffffff;
             border: 1px solid #e0e0e0;
-            border-radius: 11px;
-            padding: 8px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload:hover {
+            background: #f5f5f5;
         }
 
         .file-input {
             width: 100%;
             cursor: pointer;
-        }
-
-        .file-status {
-            display: none;
+            font-family: 'Inter Tight', sans-serif;
+            color: #363636;
         }
 
         .upload-button {
@@ -345,14 +412,32 @@
             background: #009688;
             color: white;
             border: none;
-            border-radius: 11px;
+            border-radius: 16px;
             cursor: pointer;
+            font-family: 'Inter Tight', sans-serif;
             font-size: 16px;
-            transition: background-color 0.2s ease;
+            transition: background 0.2s ease;
         }
 
         .upload-button:hover {
             background: #00897b;
+        }
+
+        /* Style the file input text */
+        .file-input::file-selector-button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #f5f5f5;
+            color: #363636;
+            margin-right: 12px;
+            cursor: pointer;
+            font-family: 'Inter Tight', sans-serif;
+            transition: background 0.2s ease;
+        }
+
+        .file-input::file-selector-button:hover {
+            background: #e0e0e0;
         }
 
         /* Update plot backgrounds */
@@ -368,6 +453,9 @@
         .plotly-graph-div {
             width: 100% !important;
             background: #FCFCFC !important;
+            border-radius: 25px;
+            font-family: 'Inter Tight', sans-serif !important;
+            transition: all 0.3s ease;  /* Add transition */
         }
 
         .no-data-message {
@@ -380,8 +468,8 @@
         /* Update combined plot styles */
         #combined-plot {
             width: 100%;
-            height: 500px;
-            margin-bottom: 24px;
+            height: 400px;
+            margin-bottom: 16px;
             background: #FCFCFC;
         }
 
@@ -391,7 +479,7 @@
         }
 
         .smoothing-control {
-            margin-bottom: 24px;
+            margin-bottom: 24px;  /* Reduced from 32px */
         }
 
         .slider-container {
@@ -404,7 +492,7 @@
             flex: 1;
             -webkit-appearance: none;
             height: 4px;
-            border-radius: 3px;
+            border-radius: 4px;
             background: #e0e0e0;
             outline: none;
         }
@@ -414,7 +502,7 @@
             appearance: none;
             width: 16px;
             height: 16px;
-            border-radius: 70%;
+            border-radius: 100%;
             background: #009688;
             cursor: pointer;
             transition: background .15s ease-in-out;
@@ -453,25 +541,23 @@
         }
 
         /* Update specific elements */
-        .sidebar h2 {
-            font-weight: 700;  /* Bold */
+        .sidebar h2 {  /* Main "Filters" heading */
+            font-size: 24px;
+            font-weight: 700;
             color: #1E1E1E;
-            font-size: 24px;  /* Large */
-            margin-bottom: 16px;
+            margin-bottom: 16px;  /* Reduced from 24px */
         }
 
-        .sidebar h3 {
-            font-weight: 500;  /* Medium */
+        .sidebar h3 {  /* Section headings */
+            font-size: 16px;
+            font-weight: 600;
             color: #1E1E1E;
-            font-size: 16px;  /* Smaller */
-            margin-bottom: 12px;
+            margin-bottom: 8px;  /* Reduced from 12px */
+            margin-top: 16px;  /* Reduced from 24px */
         }
 
         .section-header h3 {
-            font-weight: 500;  /* Medium */
-            color: #1E1E1E;
-            font-size: 16px;  /* Smaller */
-            margin-bottom: 12px;
+            /* Remove any specific overrides */
         }
 
         .filters-section h2 {
@@ -483,67 +569,53 @@
         }
 
         .stat-header {
-            font-weight: 500;  /* Medium */
-            color: #1E1E1E;
-            font-size: 16px;
-            margin-bottom: 16px;
+            /* Remove any specific overrides */
         }
 
         .stat-table th {
-            font-weight: 500;  /* Medium */
+            /* Remove any specific overrides */
         }
 
         .stat-table td {
-            font-weight: 500;  /* Medium */
+            /* Remove any specific overrides */
         }
 
         .selected-item {
-            font-weight: 500;  /* Medium */
+            /* Remove any specific overrides */
         }
 
         .checkbox-label {
-            font-weight: 500;  /* Medium */
+            /* Remove any specific overrides */
         }
 
         .no-data-message {
-            font-weight: 500;  /* Medium */
+            /* Remove any specific overrides */
         }
 
         .slider-value {
-            font-weight: 400;  /* Regular */
+            /* Remove any specific overrides */
         }
 
         .no-datasets-message {
-            padding: 16px;
-            color: #666;
-            font-style: normal;  /* Remove italic */
-            font-size: 14px;    /* Make font smaller */
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            /* Remove any specific overrides */
         }
 
         .dataset-item span {
-            font-weight: 400;  /* Regular */
+            /* Remove any specific overrides */
         }
 
         .selected-indicator {
-            font-weight: 400;  /* Regular */
+            /* Remove any specific overrides */
         }
 
         /* Update heading styles */
-        .sidebar h2 {  /* Filters heading */
-            font-weight: 700;  /* Bold */
-            color: #1E1E1E;
-            font-size: 24px;  /* Large */
-            margin-bottom: 16px;
+        .sidebar h2 {  /* Main "Filters" heading */
+            /* Remove any specific overrides */
         }
 
-        .sidebar h3,  /* Section headings like "Date range", "Search", etc. */
+        .sidebar h3,  /* Section headings */
         .section-header h3 {
-            font-weight: 500;  /* Medium */
-            color: #1E1E1E;
-            font-size: 16px;  /* Smaller */
-            margin-bottom: 12px;
+            /* Remove any specific overrides */
         }
 
         /* Remove any conflicting styles */
@@ -554,24 +626,349 @@
 
         /* Keep stat headers consistent */
         .stat-header {
-            font-weight: 500;  /* Medium */
-            color: #1E1E1E;
-            font-size: 16px;
+            /* Remove any specific overrides */
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            animation: spin-grow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin-grow {
+            0% {
+                transform: rotate(0deg) scale(0.8);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+            }
+            100% {
+                transform: rotate(360deg) scale(0.8);
+            }
+        }
+
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 40px;
+            background: #FCFCFC;
+            border-top: 2px solid #E8E8E8;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .social-link {
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+
+        .social-link:hover {
+            transform: scale(1.1);
+        }
+
+        .social-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .creator-text {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Update section spacing */
+        .date-range,
+        .smoothing-control,
+        .currently-selected,
+        .search-section,
+        .available-datasets,
+        .upload-section {
+            margin-bottom: 24px;  /* Reduced from 32px */
+        }
+
+        /* Update filters section */
+        .filters-section {
+            padding-bottom: 40px; /* Add space at bottom */
+        }
+
+        /* Ensure upload section is visible */
+        .upload-section {
+            margin-bottom: 60px; /* Extra space at bottom */
+        }
+
+        /* Update scrollbar styling */
+        .filters-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .filters-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .filters-section::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .filters-section::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Update Plotly font settings */
+        .js-plotly-plot .plotly {
+            font-family: 'Inter Tight', sans-serif !important;
+        }
+
+        /* Add these styles */
+        .theme-control {
+            margin-bottom: 16px;  /* Decreased from 32px */
+            padding-bottom: 0;  /* Removed padding */
+        }
+
+        .theme-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;  /* Decreased from 8px */
+            padding-bottom: 0;  /* Removed padding */
+        }
+
+        .theme-option {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;  /* Decreased from 8px */
+            padding: 8px;  /* Decreased from 12px */
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Add specific spacing for techno option */
+        .theme-option[data-theme="techno"] {
+            margin-bottom: 0;  /* Remove extra space after techno */
+        }
+
+        .theme-option:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .theme-option.active {
+            border-color: #009688;
+            background: rgba(0, 150, 136, 0.05);
+        }
+
+        .color-preview {
+            display: flex;
+            height: 24px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .color-preview span {
+            flex: 1;
+        }
+
+        .theme-name {
+            font-size: 14px;
+            color: #363636;
+        }
+
+        /* Add these styles */
+        .design-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .design-content.expanded {
+            max-height: 800px;
+            margin-bottom: 16px;  /* Decreased from 32px */
+        }
+
+        /* Update section header styles */
+        .section-header {
             margin-bottom: 16px;
+        }
+
+        .section-header.expanded {
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;  /* Remove bottom margin since the header handles spacing */
+        }
+
+        /* Remove top margin from the first section header */
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        /* Update filters section spacing */
+        .filters-section h2:not(:first-child) {
+            margin-top: 16px;  /* Decreased from 24px */
+            padding-top: 16px;  /* Decreased from 24px */
+            border-top: 1px solid #E8E8E8;
+        }
+
+        /* Add these styles */
+        .view-all-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-top: 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            color: #363636;
+            cursor: pointer;
+            font-family: 'Inter Tight', sans-serif;
+            transition: background 0.2s ease;
+            width: 100%;
+            text-align: center;
+        }
+
+        .view-all-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .dataset-item.hidden {
+            display: none;
+        }
+
+        .dataset-item.visible {
+            display: block;
+        }
+
+        /* Update toggle icon styles for Currently Selected */
+        .section-header .toggle-icon {
+            font-size: 12px;  /* Default size for dropdown arrows */
+        }
+
+        /* Special size for Currently Selected plus sign */
+        #selected-header .toggle-icon {
+            font-size: 20px;  /* Bigger size for the plus sign */
+            font-weight: bold;
+        }
+
+        /* Style for the count */
+        .selected-count {
+            color: #666;
+            font-weight: normal;
+        }
+
+        /* Add these styles for the legend section */
+        .legend-container {
+            margin-bottom: 32px;
+        }
+
+        .legend-container h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1E1E1E;
+            margin-bottom: 16px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #E8E8E8;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .legend-text {
+            font-size: 14px;
+            color: #363636;
+            line-height: 1.4;
+        }
+
+        /* Update sidebar toggle styles */
+        .sidebar-toggle {
+            position: static;
+            transform: none;
+            background: transparent;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            z-index: 11;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-toggle img {
+            width: 24px;
+            height: 24px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-toggle.sidebar-hidden img {
+            transform: rotate(180deg);
+        }
+
+        /* Remove hover effects */
+        .sidebar-toggle:hover {
+            background: transparent;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Econostats Logo" class="logo">
+        <button class="sidebar-toggle" id="sidebar-toggle">
+            <img src="{{ url_for('static', filename='hidesidebar.png') }}" alt="Toggle Sidebar" id="toggle-icon">
+        </button>
     </div>
 
     <div class="main-container">
         <div class="content-area">
             <div class="chart-container" style="display: none;" id="main-chart-container">
-                <div id="combined-plot"></div>
+                <div id="combined-plot" class="plotly-graph-div main-plot"></div>
                 <div id="no-data-message" class="no-data-message">
                     Select datasets from the sidebar to view charts
+                </div>
+            </div>
+            
+            <div class="chart-container legend-container" id="legend-container" style="display: none;">
+                <h3>Legend</h3>
+                <div class="legend-grid" id="chart-legend">
+                    <!-- Legend items will be dynamically added here -->
                 </div>
             </div>
             
@@ -591,6 +988,90 @@
         
         <div class="sidebar">
             <div class="filters-section">
+                <div class="section-header" id="design-header">
+                    <h2>Chart Design</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="design-content" id="design-controls">
+                    <div class="design-controls">
+                        <div class="smoothing-control">
+                            <h3>Curve Smoothing</h3>
+                            <div class="slider-container">
+                                <input type="range" id="smooth-slider" min="1" max="20" value="5" class="slider">
+                                <div class="slider-value">
+                                    <span id="smooth-value">5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="smoothing-control">
+                            <h3>Line Thickness</h3>
+                            <div class="slider-container">
+                                <input type="range" id="thickness-slider" min="1" max="8" value="2" class="slider">
+                                <div class="slider-value">
+                                    <span id="thickness-value">2</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="theme-control">
+                            <h3>Theme</h3>
+                            <div class="theme-options">
+                                <div class="theme-option" data-theme="default">
+                                    <div class="color-preview">
+                                        <span style="background: #2c3e50"></span>
+                                        <span style="background: #27ae60"></span>
+                                        <span style="background: #c0392b"></span>
+                                        <span style="background: #8e44ad"></span>
+                                        <span style="background: #d35400"></span>
+                                    </div>
+                                    <div class="theme-name">Default</div>
+                                </div>
+                                <div class="theme-option" data-theme="distinct">
+                                    <div class="color-preview">
+                                        <span style="background: #FF6B6B"></span>
+                                        <span style="background: #4ECDC4"></span>
+                                        <span style="background: #45B7D1"></span>
+                                        <span style="background: #96CEB4"></span>
+                                        <span style="background: #FFEEAD"></span>
+                                    </div>
+                                    <div class="theme-name">Distinct</div>
+                                </div>
+                                <div class="theme-option" data-theme="pastel">
+                                    <div class="color-preview">
+                                        <span style="background: #FFB3BA"></span>
+                                        <span style="background: #BAFFC9"></span>
+                                        <span style="background: #BAE1FF"></span>
+                                        <span style="background: #FFFFBA"></span>
+                                        <span style="background: #FFB3F7"></span>
+                                    </div>
+                                    <div class="theme-name">Pastel</div>
+                                </div>
+                                <div class="theme-option" data-theme="techno">
+                                    <div class="color-preview">
+                                        <span style="background: #00FF41"></span>
+                                        <span style="background: #0FF0FC"></span>
+                                        <span style="background: #FC0FC0"></span>
+                                        <span style="background: #FFA400"></span>
+                                        <span style="background: #FF0F7B"></span>
+                                    </div>
+                                    <div class="theme-name">Techno</div>
+                                </div>
+                                <div class="theme-option" data-theme="organic">
+                                    <div class="color-preview">
+                                        <span style="background: #8B4513"></span>
+                                        <span style="background: #556B2F"></span>
+                                        <span style="background: #2F4F4F"></span>
+                                        <span style="background: #8B8B00"></span>
+                                        <span style="background: #CD853F"></span>
+                                    </div>
+                                    <div class="theme-name">Organic</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <h2>Filters</h2>
                 <div class="date-range">
                     <h3>Date range</h3>
@@ -599,36 +1080,6 @@
                     </div>
                     <div class="input-group">
                         <input type="date" id="end-date" placeholder="To" class="form-input">
-                    </div>
-                </div>
-                
-                <div class="smoothing-control">
-                    <h3>Curve Smoothing</h3>
-                    <div class="slider-container">
-                        <input type="range" 
-                               id="smooth-slider" 
-                               min="1" 
-                               max="20" 
-                               value="5" 
-                               class="slider">
-                        <div class="slider-value">
-                            <span id="smooth-value">5</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="smoothing-control">
-                    <h3>Line Thickness</h3>
-                    <div class="slider-container">
-                        <input type="range" 
-                               id="thickness-slider" 
-                               min="1" 
-                               max="8" 
-                               value="2" 
-                               class="slider">
-                        <div class="slider-value">
-                            <span id="thickness-value">2</span>
-                        </div>
                     </div>
                 </div>
                 
@@ -693,6 +1144,22 @@
         </div>
     </div>
 
+    <div class="loading-overlay">
+        <img src="{{ url_for('static', filename='circlelogo.png') }}" alt="Loading..." class="loading-spinner">
+    </div>
+
+    <footer class="footer">
+        <div class="social-links">
+            <a href="https://github.com/Arsh-Jafri" target="_blank" class="social-link">
+                <img src="{{ url_for('static', filename='githublogo.png') }}" alt="GitHub" class="social-icon">
+            </a>
+            <a href="https://www.linkedin.com/in/arshjafri/" target="_blank" class="social-link">
+                <img src="{{ url_for('static', filename='linkedinlogo.png') }}" alt="LinkedIn" class="social-icon">
+            </a>
+        </div>
+        <div class="creator-text">Created by Arsh Jafri</div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -715,20 +1182,27 @@
 
             let currentSmoothingValue = 5; // Default value
             let currentThicknessValue = 2; // Default value
+            let currentTheme = 'default';
+
+            function showLoading() {
+                document.querySelector('.loading-overlay').style.display = 'flex';
+            }
+
+            function hideLoading() {
+                document.querySelector('.loading-overlay').style.display = 'none';
+            }
 
             function updateSelectedIndicators() {
                 const selectedContainer = document.getElementById('selected-indicators');
                 const checkedBoxes = document.querySelectorAll('.dataset-checkbox:checked');
-                const headerText = document.querySelector('.section-header h3');
+                const headerText = document.querySelector('#selected-header h3');
                 
-                // Update the header to show count
+                // Always show count, even when 0
                 headerText.textContent = 'Currently selected ';
-                if (checkedBoxes.length > 0) {
-                    const countSpan = document.createElement('span');
-                    countSpan.className = 'selected-count';
-                    countSpan.textContent = `(${checkedBoxes.length})`;
-                    headerText.appendChild(countSpan);
-                }
+                const countSpan = document.createElement('span');
+                countSpan.className = 'selected-count';
+                countSpan.textContent = `(${checkedBoxes.length})`;
+                headerText.appendChild(countSpan);
                 
                 // Clear the container
                 selectedContainer.innerHTML = '';
@@ -774,28 +1248,30 @@
             }
 
             async function updateDashboard() {
-                // Get all indicators from checkboxes
-                const indicators = {};
-                document.querySelectorAll('.dataset-checkbox').forEach(cb => {
-                    indicators[cb.value] = cb.checked;
-                });
-                
-                // Show/hide main chart container based on if any dataset is selected
-                const mainChartContainer = document.getElementById('main-chart-container');
-                const hasSelectedDatasets = Object.values(indicators).some(checked => checked);
-                mainChartContainer.style.display = hasSelectedDatasets ? 'block' : 'none';
-                
-                const filters = {
-                    indicators: indicators,
-                    dateRange: {
-                        start: document.getElementById('start-date').value,
-                        end: document.getElementById('end-date').value
-                    },
-                    smoothing: currentSmoothingValue,
-                    thickness: currentThicknessValue
-                };
-                
+                showLoading();  // Show loading at start
                 try {
+                    // Get all indicators from checkboxes
+                    const indicators = {};
+                    document.querySelectorAll('.dataset-checkbox').forEach(cb => {
+                        indicators[cb.value] = cb.checked;
+                    });
+                    
+                    // Show/hide main chart container based on if any dataset is selected
+                    const mainChartContainer = document.getElementById('main-chart-container');
+                    const hasSelectedDatasets = Object.values(indicators).some(checked => checked);
+                    mainChartContainer.style.display = hasSelectedDatasets ? 'block' : 'none';
+                    
+                    const filters = {
+                        indicators: indicators,
+                        dateRange: {
+                            start: document.getElementById('start-date').value,
+                            end: document.getElementById('end-date').value
+                        },
+                        smoothing: currentSmoothingValue,
+                        thickness: currentThicknessValue,
+                        theme: currentTheme
+                    };
+                    
                     const response = await fetch('/update_dashboard', {
                         method: 'POST',
                         headers: {
@@ -848,11 +1324,34 @@
                     
                     // Apply current smoothing after all plots are created
                     if (currentSmoothingValue > 1 || currentThicknessValue !== 2) {
-                        setTimeout(() => updateSmoothing(currentSmoothingValue, currentThicknessValue), 100);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        await updateSmoothing(currentSmoothingValue, currentThicknessValue);
                     }
                     
+                    // Update legend section
+                    const legendContainer = document.getElementById('legend-container');
+                    const legendGrid = document.getElementById('chart-legend');
+                    legendContainer.style.display = hasSelectedDatasets ? 'block' : 'none';
+                    
+                    // Clear existing legend items
+                    legendGrid.innerHTML = '';
+                    
+                    // Create legend items
+                    if (data.combined_plot && data.combined_plot.data) {
+                        data.combined_plot.data.forEach(trace => {
+                            const legendItem = document.createElement('div');
+                            legendItem.className = 'legend-item';
+                            legendItem.innerHTML = `
+                                <div class="legend-color" style="background-color: ${trace.line.color}"></div>
+                                <div class="legend-text">${trace.name}</div>
+                            `;
+                            legendGrid.appendChild(legendItem);
+                        });
+                    }
                 } catch (error) {
                     console.error('Error:', error);
+                } finally {
+                    hideLoading();  // Hide loading when done
                 }
             }
 
@@ -961,29 +1460,30 @@
             });
 
             // Update smoothing function to handle all plots
-            function updateSmoothing(smoothValue, thickValue) {
-                const plots = document.querySelectorAll('.plotly-graph-div');
-                plots.forEach(plot => {
-                    if (!plot || !plot.data) return;
-                    
-                    // Skip if we don't have original data
-                    if (!plot._originalData) return;
-                    
-                    // Create new data array with smoothed values and updated thickness
-                    const newData = plot._originalData.map(trace => ({
-                        ...trace,
-                        y: movingAverage(trace.y, smoothValue),
-                        line: {
-                            color: trace.line.color,
-                            width: thickValue,
-                            shape: 'spline',
-                            smoothing: smoothValue > 1 ? 1.3 : 0
-                        }
-                    }));
-                    
-                    // Update the entire plot with new data
-                    Plotly.newPlot(plot, newData, plot.layout);
-                });
+            async function updateSmoothing(smoothValue, thickValue) {
+                showLoading();  // Show loading at start
+                try {
+                    const plots = document.querySelectorAll('.plotly-graph-div');
+                    for (const plot of plots) {
+                        if (!plot || !plot.data) continue;
+                        if (!plot._originalData) continue;
+                        
+                        const newData = plot._originalData.map(trace => ({
+                            ...trace,
+                            y: movingAverage(trace.y, smoothValue),
+                            line: {
+                                color: trace.line.color,
+                                width: thickValue,
+                                shape: 'spline',
+                                smoothing: smoothValue > 1 ? 1.3 : 0
+                            }
+                        }));
+                        
+                        await Plotly.newPlot(plot, newData, plot.layout);
+                    }
+                } finally {
+                    hideLoading();  // Hide loading when done
+                }
             }
 
             // Update the moving average function for better smoothing
@@ -1024,6 +1524,152 @@
                 document.getElementById('thickness-value').textContent = e.target.value;
                 currentThicknessValue = parseInt(e.target.value);
                 updateSmoothing(currentSmoothingValue, currentThicknessValue);
+            });
+
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    document.querySelectorAll('.theme-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to selected option
+                    this.classList.add('active');
+                    
+                    // Update theme and refresh charts
+                    currentTheme = this.dataset.theme;
+                    updateDashboard();
+                });
+            });
+
+            // Add this to set initial active state
+            document.querySelector('.theme-option[data-theme="default"]').classList.add('active');
+
+            const designHeader = document.getElementById('design-header');
+            const designContent = document.getElementById('design-controls');
+
+            // Set initial state to expanded
+            designHeader.classList.add('expanded');
+            designContent.classList.add('expanded');
+
+            designHeader.addEventListener('click', () => {
+                designHeader.classList.toggle('expanded');
+                designContent.classList.toggle('expanded');
+            });
+
+            // Add this after your DOMContentLoaded event starts
+            function initializeDatasetDisplay() {
+                const datasets = document.querySelectorAll('.dataset-item');
+                const initialDisplayCount = 5;
+                let isShowingAll = false;
+
+                // Initially hide all datasets beyond the first 5
+                datasets.forEach((dataset, index) => {
+                    if (index >= initialDisplayCount) {
+                        dataset.classList.add('hidden');
+                    } else {
+                        dataset.classList.add('visible');
+                    }
+                });
+
+                // Create and add the "View all" button
+                const viewAllBtn = document.createElement('button');
+                viewAllBtn.className = 'view-all-btn';
+                viewAllBtn.textContent = 'View all datasets';
+                document.querySelector('.available-datasets').appendChild(viewAllBtn);
+
+                // Add click handler for the view all button
+                viewAllBtn.addEventListener('click', () => {
+                    isShowingAll = !isShowingAll;
+                    datasets.forEach((dataset, index) => {
+                        if (index >= initialDisplayCount) {
+                            if (isShowingAll) {
+                                dataset.classList.remove('hidden');
+                                dataset.classList.add('visible');
+                            } else {
+                                dataset.classList.remove('visible');
+                                dataset.classList.add('hidden');
+                            }
+                        }
+                    });
+                    viewAllBtn.textContent = isShowingAll ? 'Show less' : 'View all datasets';
+                });
+
+                // Update the search functionality
+                document.getElementById('indicator-search').addEventListener('input', function(e) {
+                    const searchText = e.target.value.toLowerCase();
+                    const hasSearchText = searchText.length > 0;
+
+                    datasets.forEach(item => {
+                        const name = item.querySelector('.dataset-name').textContent.toLowerCase();
+                        const id = item.querySelector('.dataset-id').textContent.toLowerCase();
+                        const matchesSearch = name.includes(searchText) || id.includes(searchText);
+
+                        // Show/hide based on search and view all state
+                        if (hasSearchText) {
+                            // During search, show all matching items regardless of view all state
+                            item.style.display = matchesSearch ? 'block' : 'none';
+                        } else {
+                            // When not searching, respect the view all state
+                            if (isShowingAll) {
+                                item.style.display = 'block';
+                            } else {
+                                const index = Array.from(datasets).indexOf(item);
+                                item.style.display = index < initialDisplayCount ? 'block' : 'none';
+                            }
+                        }
+                    });
+
+                    // Hide the view all button during search
+                    viewAllBtn.style.display = hasSearchText ? 'none' : 'block';
+                });
+            }
+
+            // Call the function after your existing initialization code
+            initializeDatasetDisplay();
+
+            // Add this to your JavaScript
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const sidebar = document.querySelector('.sidebar');
+            const contentArea = document.querySelector('.content-area');
+            const header = document.querySelector('.header');
+            let sidebarHidden = false;
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebarHidden = !sidebarHidden;
+                sidebar.classList.toggle('hidden');
+                contentArea.classList.toggle('sidebar-hidden');
+                header.classList.toggle('sidebar-hidden');
+                sidebarToggle.classList.toggle('sidebar-hidden');
+                
+                // Wait for CSS transitions to complete
+                setTimeout(() => {
+                    // Get all plot containers
+                    const plots = document.querySelectorAll('.plotly-graph-div');
+                    plots.forEach(plot => {
+                        if (plot) {
+                            // Force a full reflow/resize
+                            plot.style.width = '100%';
+                            
+                            // Update layout based on sidebar state
+                            const newLayout = {
+                                autosize: true,
+                                width: null,  // Let Plotly calculate the width
+                                height: plot.classList.contains('main-plot') ? 550 : 300,
+                                margin: plot.classList.contains('main-plot') ? 
+                                    {l: 40, r: 20, t: 60, b: 150} :
+                                    {l: 40, r: 20, t: 20, b: 20}
+                            };
+                            
+                            // Relayout the plot
+                            Plotly.relayout(plot, newLayout).then(() => {
+                                // Additional resize to ensure proper rendering
+                                window.dispatchEvent(new Event('resize'));
+                            });
+                        }
+                    });
+                }, 350); // Match this with your CSS transition duration
             });
         });
     </script>
