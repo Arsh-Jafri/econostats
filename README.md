@@ -23,10 +23,28 @@ Econostats is a dynamic web application designed to visualize and analyze key ec
 
 ## Data Management
 
-- **FRED API**: Real-time economic data fetching
+- **FRED API**: Real-time economic data fetching via REST API
 - **Pandas DataFrames**: In-memory data processing
 - **CSV Storage**: Local storage for custom uploaded datasets
 - **Requests Cache**: SQLite-based caching for API responses
+
+## API Endpoints
+
+### Data Management
+- `GET /`: Main dashboard view
+- `POST /update_dashboard`: Update dashboard with selected indicators
+- `POST /upload`: Upload custom dataset
+- `POST /delete_dataset`: Remove custom dataset
+
+### FRED Integration
+- `POST /search_series`: Search available FRED series
+- `POST /fetch_series`: Fetch specific FRED series data
+
+### Features
+- Real-time data fetching from FRED API
+- Custom dataset upload and management
+- Dashboard state management
+- Series search functionality
 
 ## Tech Stack
 
