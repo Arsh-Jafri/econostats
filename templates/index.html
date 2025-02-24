@@ -10,13 +10,87 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Add dark mode styles */
+        :root {
+            /* Light mode variables */
+            --bg-color: #ffffff;
+            --text-color: #363636;
+            --header-bg: #ffffff;
+            --card-bg: #FCFCFC;
+            --border-color: #E8E8E8;
+            --hover-bg: rgba(0, 0, 0, 0.02);
+            --grid-color: rgba(211,211,211,0.5);
+        }
+
+        [data-theme="dark"] {
+            /* Dark mode variables */
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --header-bg: #242424;
+            --card-bg: #2d2d2d;
+            --border-color: #404040;
+            --hover-bg: rgba(255, 255, 255, 0.05);
+            --grid-color: rgba(255,255,255,0.1);
+        }
+
+        /* Update existing styles to use variables */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .header {
+            background: var(--header-bg);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .theme-toggle img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .chart-container, .stat-card, .sidebar {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        /* Update other color-dependent styles */
+        .plotly-graph-div {
+            background: var(--card-bg) !important;
+        }
+
+        .stat-table td, .stat-table th {
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        /* Add transition for smooth theme switching */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
         * {
             font-family: 'Inter Tight', sans-serif;
             box-sizing: border-box;
         }
         
         body {
-            background-color: #ffffff;
             padding: 0;
             margin: 0;
         }
@@ -31,10 +105,9 @@
             left: 0;
             z-index: 10;
             width: calc(100% - 300px);  /* Match exactly with sidebar width */
-            background: #ffffff;
+            background: var(--header-bg);
             transition: width 0.3s ease;
             box-shadow: none;  /* Remove shadow */
-            border-bottom: 2px solid #E8E8E8;  /* Optional: add subtle border instead */
         }
         
         .header.sidebar-hidden {
@@ -70,7 +143,7 @@
         
         .sidebar {
             width: 300px;
-            background: #FCFCFC;
+            background: var(--card-bg);
             border-radius: 0;
             padding: 16px;  /* Reduced from 24px */
             box-shadow: none;
@@ -82,8 +155,8 @@
             margin: 0;
             overflow: hidden;  /* Changed from overflow-y: auto */
             z-index: 20;  /* Higher than header */
-            color: #363636;
-            border-left: 2px solid #E8E8E8;
+            color: var(--text-color);
+            border-left: 2px solid var(--border-color);
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease;
@@ -98,13 +171,13 @@
             margin-right: 0;
             margin-left: 0;
             width: 100%;
-            background: #FCFCFC;
+            background: var(--card-bg) !important;
             border-radius: 25px;
             padding: 24px;
             margin-bottom: 32px;
             box-shadow: none;
             overflow: hidden;
-            border: 2px solid #E8E8E8;
+            border: 2px solid var(--border-color);
             position: relative;
             z-index: 1;
             transition: width 0.3s ease;  /* Add transition */
@@ -128,19 +201,19 @@
         
         .stat-card {
             width: 100%;  /* Take full width of grid cell */
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 25px;
             padding: 20px;
             box-shadow: none;
             overflow: hidden;
-            color: #363636;
-            border: 2px solid #E8E8E8;
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
         }
         
         .stat-header {
             font-weight: 500;
             margin-bottom: 16px;
-            color: #1E1E1E;
+            color: var(--text-color);
             font-size: 16px;
         }
         
@@ -155,16 +228,16 @@
         .stat-table td {
             padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: #363636;
+            color: var(--text-color);
         }
         
         .stat-table th {
             font-weight: 600;
-            color: #1E1E1E;
+            color: var(--text-color);
             width: 50%;
         }
         
@@ -177,14 +250,14 @@
         .filters-section {
             flex: 1;
             overflow-y: auto;
-            background: #FCFCFC;
+            background: var(--card-bg);
             padding-right: 16px;
             padding-bottom: 24px;  /* Add padding at bottom */
         }
         
         .filters-section h2 {
             font-weight: 700;
-            color: #1E1E1E;
+            color: var(--text-color);
             font-size: 24px;
             margin-bottom: 16px;
         }
@@ -196,7 +269,7 @@
         .date-range input {
             width: 100%;
             padding: 8px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             margin-top: 4px;  /* Reduced from 8px */
         }
@@ -204,24 +277,24 @@
         .search-section input {
             width: 100%;
             padding: 8px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
             border-radius: 16px;
-            background: #ffffff;
-            color: #363636;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
         
         .view-chart-btn {
             display: inline-block;
             padding: 8px 16px;
-            background: #f5f5f5;
+            background: var(--card-bg);
             border-radius: 8px;
             text-decoration: none;
-            color: #363636;
+            color: var(--text-color);
             margin-top: 12px;
         }
         
         .view-chart-btn:hover {
-            background: #e0e0e0;
+            background: var(--hover-bg);
         }
         
         .available-datasets {
@@ -238,7 +311,7 @@
             gap: 12px;
             cursor: pointer;
             padding: 0;
-            color: #363636;
+            color: var(--text-color);
         }
         
         .dataset-checkbox {
@@ -255,13 +328,13 @@
         
         .dataset-name {
             font-size: 16px;
-            color: #1E1E1E;
+            color: var(--text-color);
             margin-bottom: 2px;
         }
         
         .dataset-id {
             font-size: 14px;
-            color: #666666;
+            color: var(--text-color);
         }
         
         .selected-indicator {
@@ -280,7 +353,7 @@
         }
         
         .remove-indicator {
-            color: #666;
+            color: var(--text-color);
             padding: 4px;
             margin-top: 2px;
             cursor: pointer;
@@ -288,7 +361,7 @@
         }
         
         .remove-indicator:hover {
-            color: #333;
+            color: var(--text-color);
         }
         
         .upload-button {
@@ -321,7 +394,7 @@
         }
         
         .no-results {
-            color: #666;
+            color: var(--text-color);
             font-style: italic;
             padding: 8px 0;
             display: none;
@@ -339,7 +412,7 @@
 
         .toggle-icon {
             font-size: 12px;  /* Default size for dropdown arrows */
-            color: #666;
+            color: var(--text-color);
             transition: transform 0.3s ease;
             transform: rotate(0deg);  /* Start pointing down */
         }
@@ -369,10 +442,10 @@
         .upload-section input[type="text"] {
             width: 100%;
             padding: 12px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
             border-radius: 16px;
-            background: #ffffff;
-            color: #363636;
+            background: var(--card-bg);
+            color: var(--text-color);
             font-family: 'Inter Tight', sans-serif;
             margin-bottom: 12px;
             transition: all 0.2s ease;
@@ -387,8 +460,8 @@
         .file-upload {
             width: 100%;
             padding: 12px;
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             margin-bottom: 12px;
             cursor: pointer;
@@ -396,14 +469,14 @@
         }
 
         .file-upload:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
 
         .file-input {
             width: 100%;
             cursor: pointer;
             font-family: 'Inter Tight', sans-serif;
-            color: #363636;
+            color: var(--text-color);
         }
 
         .upload-button {
@@ -428,8 +501,8 @@
             padding: 8px 12px;
             border-radius: 8px;
             border: none;
-            background: #f5f5f5;
-            color: #363636;
+            background: #f5f5f5;  /* Light gray background in light mode */
+            color: var(--text-color);
             margin-right: 12px;
             cursor: pointer;
             font-family: 'Inter Tight', sans-serif;
@@ -437,7 +510,7 @@
         }
 
         .file-input::file-selector-button:hover {
-            background: #e0e0e0;
+            background: #e0e0e0;  /* Darker gray on hover in light mode */
         }
 
         /* Update plot backgrounds */
@@ -446,13 +519,13 @@
             width: 100%;
             height: 300px;
             margin: 16px 0;
-            background: #FCFCFC;
+            background: var(--card-bg);
         }
 
         /* Update plot container styles */
         .plotly-graph-div {
             width: 100% !important;
-            background: #FCFCFC !important;
+            background: var(--card-bg) !important;
             border-radius: 25px;
             font-family: 'Inter Tight', sans-serif !important;
             transition: all 0.3s ease;  /* Add transition */
@@ -461,7 +534,7 @@
         .no-data-message {
             text-align: center;
             padding: 40px;
-            color: #363636;
+            color: var(--text-color);
             font-style: italic;
         }
 
@@ -470,7 +543,7 @@
             width: 100%;
             height: 400px;
             margin-bottom: 16px;
-            background: #FCFCFC;
+            background: var(--card-bg);
         }
 
         /* Update legend positioning */
@@ -493,7 +566,7 @@
             -webkit-appearance: none;
             height: 4px;
             border-radius: 4px;
-            background: #e0e0e0;
+            background: var(--border-color);
             outline: none;
         }
 
@@ -516,18 +589,18 @@
             min-width: 24px;
             text-align: right;
             font-size: 14px;
-            color: #363636;
+            color: var(--text-color);
         }
 
         /* Update text weights */
         h2, .sidebar h2 {
             font-weight: 700;  /* Bold */
-            color: #1E1E1E;
+            color: var(--text-color);
         }
 
         h3, .stat-header, .sidebar h3 {
             font-weight: 500;  /* Medium */
-            color: #1E1E1E;
+            color: var(--text-color);
         }
 
         body, p, .stat-table td, 
@@ -537,21 +610,21 @@
         .no-data-message,
         .no-datasets-message {
             font-weight: 400;  /* Regular */
-            color: #363636;
+            color: var(--text-color);
         }
 
         /* Update specific elements */
         .sidebar h2 {  /* Main "Filters" heading */
             font-size: 24px;
             font-weight: 700;
-            color: #1E1E1E;
+            color: var(--text-color);
             margin-bottom: 16px;  /* Reduced from 24px */
         }
 
         .sidebar h3 {  /* Section headings */
             font-size: 16px;
             font-weight: 600;
-            color: #1E1E1E;
+            color: var(--text-color);
             margin-bottom: 8px;  /* Reduced from 12px */
             margin-top: 16px;  /* Reduced from 24px */
         }
@@ -666,8 +739,8 @@
             text-align: center;
             padding: 40px 0;
             margin-top: 40px;
-            background: #FCFCFC;
-            border-top: 2px solid #E8E8E8;
+            background: var(--card-bg);
+            border-top: 2px solid var(--border-color);
         }
 
         .social-links {
@@ -692,7 +765,7 @@
         }
 
         .creator-text {
-            color: #666;
+            color: var(--text-color);
             font-size: 14px;
             font-weight: 500;
         }
@@ -771,7 +844,7 @@
         }
 
         .theme-option:hover {
-            background: rgba(0, 0, 0, 0.02);
+            background: var(--hover-bg);
         }
 
         .theme-option.active {
@@ -792,7 +865,7 @@
 
         .theme-name {
             font-size: 14px;
-            color: #363636;
+            color: var(--text-color);
         }
 
         /* Add these styles */
@@ -829,7 +902,7 @@
         .filters-section h2:not(:first-child) {
             margin-top: 16px;  /* Decreased from 24px */
             padding-top: 16px;  /* Decreased from 24px */
-            border-top: 1px solid #E8E8E8;
+            border-top: 1px solid var(--border-color);
         }
 
         /* Add these styles */
@@ -837,10 +910,10 @@
             display: inline-block;
             padding: 8px 16px;
             margin-top: 12px;
-            background: #f5f5f5;
-            border: none;
+            background: #f5f5f5;  /* Light gray background in light mode */
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            color: #363636;
+            color: var(--text-color);
             cursor: pointer;
             font-family: 'Inter Tight', sans-serif;
             transition: background 0.2s ease;
@@ -849,7 +922,17 @@
         }
 
         .view-all-btn:hover {
-            background: #e0e0e0;
+            background: #e0e0e0;  /* Darker gray on hover in light mode */
+        }
+
+        /* Dark mode styles for view all button */
+        [data-theme="dark"] .view-all-btn {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .view-all-btn:hover {
+            background: #505050;
         }
 
         .dataset-item.hidden {
@@ -873,7 +956,7 @@
 
         /* Style for the count */
         .selected-count {
-            color: #666;
+            color: var(--text-color);
             font-weight: normal;
         }
 
@@ -885,7 +968,7 @@
         .legend-container h3 {
             font-size: 18px;
             font-weight: 600;
-            color: #1E1E1E;
+            color: var(--text-color);
             margin-bottom: 16px;
         }
 
@@ -900,9 +983,9 @@
             align-items: center;
             gap: 12px;
             padding: 8px 12px;
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 8px;
-            border: 1px solid #E8E8E8;
+            border: 1px solid var(--border-color);
         }
 
         .legend-color {
@@ -914,7 +997,7 @@
 
         .legend-text {
             font-size: 14px;
-            color: #363636;
+            color: var(--text-color);
             line-height: 1.4;
         }
 
@@ -946,14 +1029,103 @@
         .sidebar-toggle:hover {
             background: transparent;
         }
+
+        /* Update icon styles for dark mode with gray instead of white */
+        [data-theme="dark"] .social-icon {
+            filter: brightness(0) saturate(100%) invert(80%);  /* Light gray instead of white */
+        }
+
+        [data-theme="dark"] .remove-indicator {
+            color: rgba(200, 200, 200, 0.8);  /* Light gray */
+        }
+
+        [data-theme="dark"] .remove-indicator:hover {
+            color: rgba(220, 220, 220, 1);  /* Slightly lighter on hover */
+        }
+
+        [data-theme="dark"] .toggle-icon {
+            color: #cccccc;  /* Light gray */
+        }
+
+        [data-theme="dark"] .sidebar-toggle img,
+        [data-theme="dark"] .theme-toggle img {
+            filter: brightness(0) saturate(100%) invert(80%);  /* Light gray instead of white */
+        }
+
+        /* Update calendar icon in dark mode */
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: brightness(0) saturate(100%) invert(80%);  /* Light gray instead of white */
+        }
+
+        /* Update loading spinner for dark mode */
+        [data-theme="dark"] .loading-overlay {
+            background: rgba(0, 0, 0, 0.9);  /* Dark background with opacity */
+        }
+
+        /* Remove the filter invert for loading spinner in dark mode */
+        [data-theme="dark"] .loading-spinner {
+            filter: none;  /* Keep the logo as is */
+        }
+
+        /* Update file input button for dark mode */
+        [data-theme="dark"] .file-input::file-selector-button {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .file-input::file-selector-button:hover {
+            background: #505050;
+        }
+
+        /* Add these styles for date inputs in dark mode */
+        [data-theme="dark"] input[type="date"] {
+            background: #404040;
+            color: #ffffff;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: brightness(0) saturate(100%) invert(80%);  /* Light gray instead of white */
+        }
+
+        /* Update chart container and plot backgrounds */
+        .chart-container {
+            background: var(--card-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        /* Ensure Plotly elements are visible */
+        .plotly-graph-div {
+            background: var(--card-bg);
+        }
+
+        /* Force dark mode backgrounds */
+        [data-theme="dark"] .chart-container,
+        [data-theme="dark"] .plotly-graph-div {
+            background: var(--card-bg);
+        }
+
+        /* Make sure SVG elements are visible */
+        .js-plotly-plot .plot-container .svg-container {
+            background: inherit !important;
+        }
+
+        .js-plotly-plot .main-svg {
+            background: inherit !important;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Econostats Logo" class="logo">
-        <button class="sidebar-toggle" id="sidebar-toggle">
-            <img src="{{ url_for('static', filename='hidesidebar.png') }}" alt="Toggle Sidebar" id="toggle-icon">
-        </button>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Econostats Logo" class="logo" id="main-logo">
+        <div class="header-controls">
+            <button class="theme-toggle" id="theme-toggle">
+                <img src="{{ url_for('static', filename='moon.png') }}" alt="Theme Toggle" id="theme-icon">
+            </button>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <img src="{{ url_for('static', filename='hidesidebar.png') }}" alt="Toggle Sidebar" id="toggle-icon">
+            </button>
+        </div>
     </div>
 
     <div class="main-container">
@@ -1248,7 +1420,7 @@
             }
 
             async function updateDashboard() {
-                showLoading();  // Show loading at start
+                showLoading();
                 try {
                     // Get all indicators from checkboxes
                     const indicators = {};
@@ -1286,16 +1458,11 @@
                     
                     const data = await response.json();
                     
-                    // Update combined plot
-                    if (data.combined_plot) {
-                        const combinedPlot = document.getElementById('combined-plot');
-                        // Store original data before plotting
-                        const combinedOriginalData = JSON.parse(JSON.stringify(data.combined_plot.data));
-                        Plotly.newPlot(combinedPlot, data.combined_plot.data, data.combined_plot.layout);
-                        combinedPlot._originalData = combinedOriginalData;
-                    }
+                    // Set the base layout options based on current theme
+                    const bgColor = isDarkMode ? '#2d2d2d' : '#FCFCFC';
+                    const textColor = isDarkMode ? '#ffffff' : '#363636';
                     
-                    // Update individual plots
+                    // Update individual plots section in updateDashboard function
                     Object.keys(indicators).forEach(indicator => {
                         const section = document.getElementById(`${indicator}-section`);
                         if (section) {
@@ -1304,9 +1471,38 @@
                             if (indicators[indicator] && data.plots[indicator]) {
                                 const plotDiv = document.getElementById(`${indicator}-plot`);
                                 if (plotDiv) {
-                                    // Store original data before plotting
                                     const originalData = JSON.parse(JSON.stringify(data.plots[indicator].data));
-                                    Plotly.newPlot(plotDiv, data.plots[indicator].data, data.plots[indicator].layout);
+                                    
+                                    // Merge the theme colors with the existing layout
+                                    const plotLayout = {
+                                        ...data.plots[indicator].layout,
+                                        paper_bgcolor: bgColor,
+                                        plot_bgcolor: bgColor,
+                                        font: {
+                                            color: textColor,
+                                            family: 'Inter Tight'
+                                        },
+                                        xaxis: {
+                                            ...data.plots[indicator].layout.xaxis,
+                                            color: textColor,
+                                            gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                            tickfont: {
+                                                color: textColor,
+                                                family: 'Inter Tight'
+                                            }
+                                        },
+                                        yaxis: {
+                                            ...data.plots[indicator].layout.yaxis,
+                                            color: textColor,
+                                            gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                            tickfont: {
+                                                color: textColor,
+                                                family: 'Inter Tight'
+                                            }
+                                        }
+                                    };
+                                    
+                                    Plotly.newPlot(plotDiv, data.plots[indicator].data, plotLayout);
                                     plotDiv._originalData = originalData;
                                 }
                                 
@@ -1348,10 +1544,56 @@
                             legendGrid.appendChild(legendItem);
                         });
                     }
+
+                    // Inside updateDashboard function, update the plot creation section:
+                    if (data.combined_plot) {
+                        const combinedPlot = document.getElementById('combined-plot');
+                        const combinedOriginalData = JSON.parse(JSON.stringify(data.combined_plot.data));
+                        
+                        // Merge the theme colors with the existing layout
+                        const combinedLayout = {
+                            ...data.combined_plot.layout,
+                            paper_bgcolor: bgColor,
+                            plot_bgcolor: bgColor,
+                            font: {
+                                color: textColor,
+                                family: 'Inter Tight'
+                            },
+                            title: {
+                                text: 'Combined Economic Indicators (Normalized)',
+                                font: {
+                                    color: textColor,
+                                    family: 'Inter Tight',
+                                    size: 24
+                                }
+                            },
+                            xaxis: {
+                                ...data.combined_plot.layout.xaxis,
+                                color: textColor,
+                                gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                tickfont: {
+                                    color: textColor,
+                                    family: 'Inter Tight'
+                                }
+                            },
+                            yaxis: {
+                                ...data.combined_plot.layout.yaxis,
+                                color: textColor,
+                                gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                tickfont: {
+                                    color: textColor,
+                                    family: 'Inter Tight'
+                                }
+                            }
+                        };
+                        
+                        Plotly.newPlot(combinedPlot, data.combined_plot.data, combinedLayout);
+                        combinedPlot._originalData = combinedOriginalData;
+                    }
                 } catch (error) {
                     console.error('Error:', error);
                 } finally {
-                    hideLoading();  // Hide loading when done
+                    hideLoading();
                 }
             }
 
@@ -1671,6 +1913,90 @@
                     });
                 }, 350); // Match this with your CSS transition duration
             });
+
+            // Add theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const mainLogo = document.getElementById('main-logo');
+            let isDarkMode = false;
+
+            themeToggle.addEventListener('click', () => {
+                isDarkMode = !isDarkMode;
+                document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+                
+                // Update theme toggle icon
+                themeIcon.src = isDarkMode 
+                    ? "{{ url_for('static', filename='sun.png') }}"
+                    : "{{ url_for('static', filename='moon.png') }}";
+                
+                // Update logo
+                mainLogo.src = isDarkMode
+                    ? "{{ url_for('static', filename='logo-white.png') }}"
+                    : "{{ url_for('static', filename='logo.png') }}";
+                
+                // Update Plotly charts
+                updateChartsTheme();
+            });
+
+            function updateChartsTheme() {
+                const plots = document.querySelectorAll('.plotly-graph-div');
+                plots.forEach(plot => {
+                    if (plot && plot.layout) {
+                        const isMainPlot = plot.classList.contains('main-plot');
+                        const bgColor = isDarkMode ? '#2d2d2d' : '#FCFCFC';
+                        const textColor = isDarkMode ? '#ffffff' : '#363636';
+                        
+                        const newLayout = {
+                            paper_bgcolor: bgColor,
+                            plot_bgcolor: bgColor,
+                            font: {
+                                color: textColor,
+                                family: 'Inter Tight',
+                                size: isMainPlot ? 24 : 10
+                            },
+                            title: {
+                                text: isMainPlot ? 'Combined Economic Indicators (Normalized)' : null,
+                                font: {
+                                    color: textColor,
+                                    family: 'Inter Tight',
+                                    size: 24
+                                }
+                            },
+                            showlegend: false,
+                            xaxis: {
+                                gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                color: textColor,
+                                tickfont: {
+                                    family: 'Inter Tight',
+                                    size: isMainPlot ? 12 : 10,
+                                    color: textColor
+                                },
+                                title: {
+                                    font: {
+                                        color: textColor
+                                    }
+                                }
+                            },
+                            yaxis: {
+                                gridcolor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(211,211,211,0.5)',
+                                color: textColor,
+                                tickfont: {
+                                    family: 'Inter Tight',
+                                    size: isMainPlot ? 12 : 10,
+                                    color: textColor
+                                },
+                                title: {
+                                    font: {
+                                        color: textColor
+                                    }
+                                }
+                            }
+                        };
+                        
+                        Plotly.relayout(plot, newLayout);
+                    }
+                });
+            }
         });
     </script>
 </body>
