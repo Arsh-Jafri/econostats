@@ -99,7 +99,3 @@ Created by [Arsh Jafri](https://github.com/Arsh-Jafri)
 - Federal Reserve Economic Data (FRED) for providing the economic data API
 - AWS for hosting services
 - All contributors and supporters of the project
-```
-
-
-```
