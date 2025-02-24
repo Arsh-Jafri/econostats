@@ -97,6 +97,10 @@ class FredData:
         
         # Add custom indicators
         for dataset_name, dataset_info in self.custom_indicators.items():
+            print(f"\nProcessing custom dataset: {dataset_name}")
+            print(f"Data type: {type(dataset_info['data'])}")
+            print(f"Columns: {dataset_info['data'].columns}")
+            print(f"Sample data:\n{dataset_info['data'].head()}")
             data[dataset_name] = dataset_info['data']
         
         return data
@@ -146,7 +150,14 @@ class FredData:
 
     def add_custom_dataset(self, name, df):
         """Add a new custom dataset"""
-        self.custom_indicators[name] = {
-            'description': name,
-            'data': df
-        } 
+        if isinstance(df, pd.DataFrame):
+            # Ensure the dataframe has the correct format
+            if len(df.columns) != 1:
+                raise ValueError("DataFrame must have exactly one value column")
+            
+            self.custom_indicators[name] = {
+                'description': name,
+                'data': df
+            }
+        else:
+            raise ValueError("Data must be a pandas DataFrame") 

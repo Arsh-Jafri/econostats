@@ -91,14 +91,24 @@ def create_time_series_plot(df, title, y_label, indicator_id, theme_colors):
     """
     Create an interactive time series plot using Plotly
     """
+    print(f"\nCreating plot for: {indicator_id}")
+    print(f"Data type: {type(df)}")
+    print(f"Columns: {df.columns if isinstance(df, pd.DataFrame) else 'Not a DataFrame'}")
+    print(f"Sample data:\n{df.head()}")
+    
     # Get the color for this indicator from the theme
     line_color = theme_colors.get(indicator_id, '#000000')
+    if 'custom' in theme_colors and indicator_id in theme_colors['custom']:
+        line_color = theme_colors['custom'][indicator_id]
+        print(f"Using custom color: {line_color}")
     
     # Convert DataFrame to series if needed
     if isinstance(df, pd.DataFrame):
-        series = df.iloc[:, 0]
+        series = df.iloc[:, 0] if len(df.columns) > 0 else df
     else:
         series = df
+    
+    print(f"Final series data:\n{series.head()}")
     
     fig = go.Figure()
     
@@ -106,7 +116,7 @@ def create_time_series_plot(df, title, y_label, indicator_id, theme_colors):
         go.Scatter(
             x=df.index.strftime('%Y-%m-%d').tolist(),
             y=series.values.tolist(),
-            name=y_label,  # Use y_label instead of title for legend
+            name=y_label,
             line=dict(
                 color=line_color,
                 shape='spline',

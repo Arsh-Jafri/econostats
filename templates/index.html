@@ -307,7 +307,7 @@
         }
         
         .dataset-item {
-            margin-bottom: 16px;
+            margin-bottom: 8px;  /* Reduced from 16px */
         }
         
         .checkbox-label {
@@ -315,27 +315,36 @@
             align-items: flex-start;
             gap: 12px;
             cursor: pointer;
-            padding: 0;
-            color: var(--text-color);
+            padding: 6px 12px;  /* Reduced vertical padding from 8px to 6px */
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .checkbox-label:hover {
+            background: var(--hover-bg);
         }
         
         .dataset-checkbox {
             width: 20px;
             height: 20px;
             margin: 0;
-            margin-top: 2px;
+            margin-top: 4px;  /* Adjust to align with text */
+            accent-color: #009688;  /* Match the green color */
+            cursor: pointer;
         }
         
         .dataset-info {
             display: flex;
             flex-direction: column;
+            padding-top: 2px;  /* Fine-tune text alignment */
         }
         
         .dataset-name {
             font-size: 14px;
             font-weight: 500;
             color: var(--text-color);
-            margin-bottom: 2px;
+            margin-bottom: 1px;  /* Reduced from 2px */
+            line-height: 1.3;  /* Slightly reduced from 1.4 */
         }
         
         .dataset-id {
@@ -343,6 +352,7 @@
             font-weight: 400;
             color: var(--text-color);
             opacity: 0.8;
+            line-height: 1.3;  /* Slightly reduced from 1.4 */
         }
         
         .selected-indicator {
@@ -1450,6 +1460,33 @@
                 display: none !important;
             }
         }
+
+        /* Add these styles */
+        .custom-dataset {
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .delete-dataset-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+            padding: 4px 8px;
+            border-radius: 50%;
+        }
+
+        .delete-dataset-btn:hover {
+            opacity: 1;
+            background: var(--hover-bg);
+        }
     </style>
 </head>
 <body>
@@ -2020,10 +2057,19 @@
                         throw new Error(responseData.error || 'Upload failed');
                     }
                     
+                    // Generate and store a random color for the new dataset
+                    const randomColor = getRandomColor();
+                    Object.keys(THEME_COLORS).forEach(theme => {
+                        if (!THEME_COLORS[theme].custom) {
+                            THEME_COLORS[theme].custom = {};
+                        }
+                        THEME_COLORS[theme].custom[responseData.name] = randomColor;
+                    });
+                    
                     // Add new dataset to available datasets
                     const availableIndicators = document.getElementById('available-indicators');
                     const newDataset = document.createElement('div');
-                    newDataset.className = 'dataset-item';
+                    newDataset.className = 'dataset-item custom-dataset';
                     newDataset.innerHTML = `
                         <label class="checkbox-label">
                             <input type="checkbox" 
@@ -2035,7 +2081,39 @@
                                 <span class="dataset-id">${responseData.name}</span>
                             </div>
                         </label>
+                        <button class="delete-dataset-btn" data-dataset="${responseData.name}">
+                            <span>×</span>
+                        </button>
                     `;
+                    
+                    // Add delete handler
+                    newDataset.querySelector('.delete-dataset-btn').addEventListener('click', async function() {
+                        const datasetName = this.dataset.dataset;
+                        if (confirm(`Are you sure you want to delete ${datasetName}?`)) {
+                            try {
+                                const response = await fetch('/delete_dataset', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ dataset_name: datasetName })
+                                });
+                                
+                                if (!response.ok) {
+                                    throw new Error('Failed to delete dataset');
+                                }
+                                
+                                // Remove from UI
+                                this.closest('.dataset-item').remove();
+                                // Update dashboard
+                                updateDashboard();
+                                
+                            } catch (error) {
+                                console.error('Delete error:', error);
+                                alert('Failed to delete dataset');
+                            }
+                        }
+                    });
                     
                     // Add event listeners to new checkbox
                     const newCheckbox = newDataset.querySelector('.dataset-checkbox');
@@ -2507,6 +2585,65 @@
                     };
                 });
             });
+
+            // Add color generation functions
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // Add custom colors object to each theme
+            const THEME_COLORS = {
+                'default': {
+                    'CPIAUCSL': '#2c3e50',
+                    // ... existing colors ...
+                    'custom': {}  // For uploaded datasets
+                },
+                'distinct': {
+                    'CPIAUCSL': '#FF6B6B',
+                    // ... existing colors ...
+                    'custom': {}
+                },
+                'pastel': {
+                    'CPIAUCSL': '#FFB3BA',
+                    // ... existing colors ...
+                    'custom': {}
+                },
+                'techno': {
+                    'CPIAUCSL': '#00FF41',
+                    // ... existing colors ...
+                    'custom': {}
+                },
+                'organic': {
+                    'CPIAUCSL': '#8B4513',
+                    // ... existing colors ...
+                    'custom': {}
+                }
+            };
+
+            // Modify the upload success handler to use theme colors
+            if (!response.ok) {
+                throw new Error(responseData.error || 'Upload failed');
+            }
+
+            // Generate and store a random color for the new dataset in all themes
+            const baseColor = getRandomColor();
+            Object.keys(THEME_COLORS).forEach(theme => {
+                if (!THEME_COLORS[theme].custom) {
+                    THEME_COLORS[theme].custom = {};
+                }
+                THEME_COLORS[theme].custom[responseData.name] = baseColor;
+            });
+
+            // Update the createDashboardComponents function to use custom colors
+            function getDatasetColor(datasetId, theme) {
+                const themeColors = THEME_COLORS[theme] || THEME_COLORS['default'];
+                return themeColors.custom[datasetId] || themeColors[datasetId] || getRandomColor();
+            }
         });
     </script>
     <div class="mobile-warning">

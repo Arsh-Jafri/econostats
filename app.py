@@ -77,16 +77,11 @@ def update_dashboard():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
-        print("Upload request received")
         if 'file' not in request.files:
-            print("No file in request")
             return jsonify({'error': 'No file provided'}), 400
             
         file = request.files['file']
         dataset_name = request.form.get('name')
-        
-        print(f"File name: {file.filename}")
-        print(f"Dataset name: {dataset_name}")
         
         if file.filename == '':
             print("Empty filename")
@@ -100,43 +95,42 @@ def upload_file():
             print("No dataset name provided")
             return jsonify({'error': 'Please provide a name for the dataset'}), 400
         
-        # Secure the filename using the custom name
         filename = secure_filename(f"{dataset_name}.csv")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        print(f"Target filepath: {filepath}")
-        
-        # Check if file already exists
-        if os.path.exists(filepath):
-            print("File already exists")
-            return jsonify({'error': 'A dataset with this name already exists'}), 400
         
         # Read the CSV data first to validate
         try:
-            print("Reading CSV data")
             df = pd.read_csv(file)
-            print("CSV data shape:", df.shape)
             
             # Basic validation
             if len(df.columns) < 2:
-                print("Invalid number of columns")
                 raise ValueError("CSV must have at least 2 columns (date and value)")
             
-            # Try to parse dates from the first column
-            print("Parsing dates")
-            df.set_index(pd.to_datetime(df.iloc[:, 0]), inplace=True)
-            df = df.iloc[:, 0]  # Take only the first data column
-            df = pd.DataFrame(df)
+            # Set the date column as index
+            date_col = df.columns[0]
+            value_col = df.columns[1]
+            
+            print(f"Original columns: {df.columns}")
+            print(f"Data before processing:\n{df.head()}")
+            
+            df[date_col] = pd.to_datetime(df[date_col])
+            df.set_index(date_col, inplace=True)
+            
+            # Keep only the value column and rename it
+            df = df[[value_col]]
             df.columns = [dataset_name]
             
+            print(f"Data after processing:\n{df.head()}")
+            
             # Save the processed file
-            print("Saving processed file")
             df.to_csv(filepath)
             
             # Add to FredData instance
-            print("Adding to FredData instance")
             fred.add_custom_dataset(dataset_name, df)
             
-            print("Upload successful")
+            # Verify data was added correctly
+            print(f"Verifying data in FredData:\n{fred.custom_indicators[dataset_name]['data'].head()}")
+            
             return jsonify({
                 'message': 'File uploaded successfully',
                 'name': dataset_name,
@@ -191,6 +185,27 @@ def fetch_series():
             'data': data.to_dict(orient='records'),
             'series_id': series_id
         })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/delete_dataset', methods=['POST'])
+def delete_dataset():
+    try:
+        dataset_name = request.json.get('dataset_name')
+        if not dataset_name:
+            return jsonify({'error': 'No dataset name provided'}), 400
+            
+        # Delete the file
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{dataset_name}.csv")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        # Remove from FredData instance
+        if hasattr(fred, 'custom_indicators'):
+            fred.custom_indicators.pop(dataset_name, None)
+            
+        return jsonify({'message': 'Dataset deleted successfully'})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
