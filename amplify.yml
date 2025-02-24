@@ -1,0 +1,19 @@
+version: 1
+applications:
+  - frontend:
+      phases:
+        build:
+          commands:
+            - pip install -r requirements.txt
+    appRoot: .
+    backend:
+      phases:
+        build:
+          commands:
+            - '# Execute build commands here'
+      artifacts:
+        baseDirectory: /
+        files:
+          - '**/*'
+      cache:
+        paths: [] 
