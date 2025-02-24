@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/logo-white.png" alt="Econostats Logo" width="600"/>
+  <img src="static/logo-white.png" alt="Econostats Logo" width="400"/>
 </p>
 
 <h1 align="center"><a href="https://econostats.co">econostats.co</a></h1>
