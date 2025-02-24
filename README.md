@@ -27,7 +27,6 @@ Econostats is a dynamic web application designed to visualize and analyze key ec
 - HTML5/CSS3
 - JavaScript
 - Plotly.js for interactive charts
-- Inter Tight font family for modern typography
 
 ### Backend
 - Python 3.11
