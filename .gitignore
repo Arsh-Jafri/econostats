@@ -20,13 +20,6 @@ venv.bak/
 .ebextensions/*.config.old
 .ebextensions/*.config.bak
 
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
 # Application specific
 uploads/
 fred_cache.sqlite
