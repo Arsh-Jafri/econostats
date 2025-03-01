@@ -5,8 +5,10 @@ from validate_data import load_and_validate_dataset
 import os
 from werkzeug.utils import secure_filename
 from fred_api import FredData
+from flask_compress import Compress
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
+Compress(app)
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -18,6 +20,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Initialize FRED API
 fred = FredData()
+
+# Enable aggressive caching for static files
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 year in seconds
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -209,6 +214,16 @@ def delete_dataset():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.after_request
+def add_header(response):
+    # Cache static files
+    if 'Cache-Control' not in response.headers:
+        if request.path.startswith('/static'):
+            response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year
+        else:
+            response.headers['Cache-Control'] = 'no-store'
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
