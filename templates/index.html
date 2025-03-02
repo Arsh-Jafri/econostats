@@ -2625,21 +2625,7 @@
                 }
             };
 
-            // Modify the upload success handler to use theme colors
-            if (!response.ok) {
-                throw new Error(responseData.error || 'Upload failed');
-            }
-
-            // Generate and store a random color for the new dataset in all themes
-            const baseColor = getRandomColor();
-            Object.keys(THEME_COLORS).forEach(theme => {
-                if (!THEME_COLORS[theme].custom) {
-                    THEME_COLORS[theme].custom = {};
-                }
-                THEME_COLORS[theme].custom[responseData.name] = baseColor;
-            });
-
-            // Update the createDashboardComponents function to use custom colors
+            // Helper function to get dataset color based on theme
             function getDatasetColor(datasetId, theme) {
                 const themeColors = THEME_COLORS[theme] || THEME_COLORS['default'];
                 return themeColors.custom[datasetId] || themeColors[datasetId] || getRandomColor();

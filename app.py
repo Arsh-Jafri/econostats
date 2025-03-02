@@ -1,4 +1,4 @@
-from flask import Flask, render_template, make_response, jsonify, request
+from flask import Flask, render_template, make_response, jsonify, request, send_from_directory
 import pandas as pd
 from visualizations import create_dashboard_components, create_combined_plot, filter_dataframe
 from validate_data import load_and_validate_dataset
@@ -6,23 +6,27 @@ import os
 from werkzeug.utils import secure_filename
 from fred_api import FredData
 from flask_compress import Compress
+from datetime import datetime, timedelta
 
+# Initialize Flask application
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-Compress(app)
+
+# Initialize and configure Flask-Compress for gzip compression
+compress = Compress()
+compress.init_app(app)
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Enable aggressive caching for static files
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 year in seconds
 
 # Create uploads directory if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Initialize FRED API
 fred = FredData()
-
-# Enable aggressive caching for static files
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 year in seconds
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -218,12 +222,20 @@ def delete_dataset():
 @app.after_request
 def add_header(response):
     # Cache static files
-    if 'Cache-Control' not in response.headers:
-        if request.path.startswith('/static'):
-            response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year
-        else:
-            response.headers['Cache-Control'] = 'no-store'
+    if request.path.startswith('/static'):
+        # Set expiration to 1 year for static assets (maximum recommended)
+        expiry = datetime.now() + timedelta(days=365)
+        response.headers['Expires'] = expiry.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year in seconds
+    else:
+        # For non-static content, prevent caching
+        response.headers['Cache-Control'] = 'no-store'
     return response
 
+# For AWS Elastic Beanstalk, the application needs to be named 'application'
+application = app
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5002) 
+    # Use the application.run() for local development
+    # Elastic Beanstalk will use the 'application' object
+    application.run(debug=False, port=5002) 
